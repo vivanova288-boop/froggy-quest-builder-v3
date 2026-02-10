@@ -1,0 +1,1626 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Froggy Quest Builder</title>
+<style>
+:root {
+    --bg: #0f172a;
+    --panel: #1e293b;
+    --accent: #22c55e;
+    --accent-hover: #16a34a;
+    --text: #f1f5f9;
+    --border: #334155;
+    --input-bg: #0f172a;
+    --danger: #ef4444;
+    --blue: #3b82f6;
+    --purple: #8b5cf6;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow: hidden;
+    display: flex;
+    height: 100vh;
+}
+
+/* SIDEBAR */
+#sidebar {
+    width: 480px;
+    min-width: 480px;
+    background: var(--panel);
+    padding: 16px;
+    overflow-y: auto;
+    border-right: 2px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+#sidebar::-webkit-scrollbar { width: 6px; }
+#sidebar::-webkit-scrollbar-track { background: var(--bg); }
+#sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+.group {
+    background: var(--bg);
+    padding: 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+}
+
+.group-title {
+    font-size: 10px;
+    color: var(--accent);
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+label {
+    display: block;
+    font-size: 11px;
+    margin: 10px 0 4px;
+    color: #94a3b8;
+    font-weight: 500;
+}
+
+input[type="text"], input[type="number"], select, textarea {
+    width: 100%;
+    padding: 9px 11px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    color: #fff;
+    border-radius: 7px;
+    font-size: 13px;
+    transition: border-color 0.2s;
+    font-family: inherit;
+}
+
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+
+input[type="color"] {
+    height: 40px;
+    cursor: pointer;
+    padding: 3px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+}
+
+/* FILE INPUT — красивый */
+.file-upload-wrap {
+    position: relative;
+    margin: 4px 0 0;
+}
+
+.file-upload-wrap input[type="file"] {
+    position: absolute;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    top: 0; left: 0;
+}
+
+.file-upload-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: var(--panel);
+    border: 1px dashed var(--border);
+    border-radius: 7px;
+    font-size: 12px;
+    color: #94a3b8;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+}
+
+.file-upload-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.file-upload-btn.has-file {
+    border-color: var(--accent);
+    border-style: solid;
+    color: var(--accent);
+    background: rgba(34,197,94,0.08);
+}
+
+.file-thumb {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+    border-radius: 4px;
+    display: none;
+    background: #000;
+    border: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
+.file-clear {
+    margin-left: auto;
+    background: none;
+    border: none;
+    color: var(--danger);
+    cursor: pointer;
+    font-size: 14px;
+    padding: 2px 4px;
+    display: none;
+    line-height: 1;
+}
+
+.file-upload-btn.has-file .file-clear { display: block; }
+.file-upload-btn.has-file .file-thumb { display: block; }
+
+.size-badge {
+    font-size: 9px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1px 5px;
+    color: #64748b;
+    margin-left: auto;
+}
+
+.size-badge.warn { color: #f59e0b; border-color: #f59e0b; }
+.size-badge.danger { color: var(--danger); border-color: var(--danger); }
+
+.checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 8px 0;
+}
+
+input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: var(--accent);
+}
+
+.color-picker-row {
+    display: grid;
+    grid-template-columns: 48px 1fr;
+    gap: 8px;
+    align-items: center;
+}
+
+.slider-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+input[type="range"] {
+    flex: 1;
+    accent-color: var(--accent);
+    cursor: pointer;
+}
+
+.slider-value {
+    min-width: 40px;
+    text-align: right;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent);
+}
+
+.hint {
+    font-size: 10px;
+    color: #64748b;
+    margin-top: 5px;
+    line-height: 1.4;
+}
+
+.warn-note {
+    background: rgba(245,158,11,0.1);
+    border: 1px solid rgba(245,158,11,0.3);
+    border-radius: 7px;
+    padding: 8px 10px;
+    font-size: 11px;
+    color: #f59e0b;
+    line-height: 1.5;
+    margin-bottom: 8px;
+}
+
+/* КНОПКИ */
+.btn {
+    width: 100%;
+    padding: 12px 16px;
+    border: none;
+    border-radius: 9px;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.2s;
+    font-family: inherit;
+}
+
+.btn-green { background: var(--accent); color: #052e16; }
+.btn-green:hover { background: var(--accent-hover); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(34,197,94,0.3); }
+
+.btn-blue { background: var(--blue); color: white; }
+.btn-blue:hover { background: #2563eb; transform: translateY(-1px); }
+
+.btn-purple { background: var(--purple); color: white; }
+.btn-purple:hover { background: #7c3aed; transform: translateY(-1px); }
+
+.btn-danger-sm {
+    background: rgba(239,68,68,0.15);
+    border: 1px solid rgba(239,68,68,0.3);
+    color: var(--danger);
+    padding: 5px 9px;
+    font-size: 11px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 700;
+    font-family: inherit;
+    transition: background 0.2s;
+}
+.btn-danger-sm:hover { background: rgba(239,68,68,0.25); }
+
+/* ВОПРОСЫ */
+.question-item {
+    background: var(--panel);
+    padding: 12px;
+    border-radius: 9px;
+    margin-bottom: 10px;
+    border: 1px solid var(--border);
+}
+
+.question-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.question-number {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.option-grid { display: grid; gap: 6px; margin-top: 6px; }
+
+.option-row {
+    display: grid;
+    grid-template-columns: 20px 1fr 22px;
+    gap: 8px;
+    align-items: center;
+}
+
+.option-row input[type="radio"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: var(--accent);
+}
+
+.option-row input[type="text"] { margin: 0; font-size: 12px; padding: 7px 10px; }
+
+.opt-letter {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent);
+    text-align: center;
+}
+
+/* LEVELS */
+.levels-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 8px 0;
+}
+
+.level-tab {
+    padding: 7px 14px;
+    background: var(--panel);
+    border: 2px solid var(--border);
+    border-radius: 7px;
+    text-align: center;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 700;
+    transition: all 0.2s;
+    color: var(--text);
+}
+
+.level-tab.active {
+    background: var(--accent);
+    color: #052e16;
+    border-color: var(--accent);
+}
+
+/* PREVIEW */
+#preview-area {
+    flex: 1;
+    background: #000;
+    display: flex;
+    flex-direction: column;
+}
+
+#preview-header {
+    background: var(--panel);
+    padding: 12px 18px;
+    border-bottom: 2px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+#preview-header h3 { margin: 0; font-size: 13px; color: var(--text); }
+
+#preview-header .size-info {
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.size-ok { color: var(--accent); }
+.size-warn { color: #f59e0b; }
+.size-bad { color: var(--danger); }
+
+iframe {
+    flex: 1;
+    border: none;
+    background: #000;
+}
+
+/* QUESTIONS TEXTAREA */
+textarea#questions-input {
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    line-height: 1.6;
+    resize: vertical;
+}
+
+.audio-grid { display: grid; gap: 8px; }
+
+.audio-item {
+    display: grid;
+    grid-template-columns: 110px 1fr;
+    gap: 8px;
+    align-items: center;
+}
+
+.audio-label { font-size: 11px; color: #94a3b8; }
+
+/* STATUS BAR */
+#status-bar {
+    background: var(--input-bg);
+    border-top: 1px solid var(--border);
+    padding: 8px 16px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+#status-text { font-size: 11px; color: #64748b; flex: 1; }
+
+/* COMPRESSION SETTINGS */
+.compress-options {
+    background: rgba(34,197,94,0.06);
+    border: 1px solid rgba(34,197,94,0.2);
+    border-radius: 8px;
+    padding: 10px;
+    margin-top: 8px;
+}
+
+.compress-options label {
+    color: var(--accent);
+    margin-top: 0;
+}
+
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+</style>
+</head>
+<body>
+
+<div id="sidebar">
+
+    <!-- СЖАТИЕ — самое важное! -->
+    <div class="group">
+        <div class="group-title">⚡ Настройки сжатия для Genially</div>
+        <div class="warn-note">
+            Картинки и аудио в формате base64 делают код очень тяжёлым. Сжатие позволяет уменьшить размер в 5–20 раз.
+        </div>
+        <div class="compress-options">
+            <label>Максимальный размер картинки (px)</label>
+            <div class="slider-container">
+                <input type="range" id="img-max-size" min="100" max="800" value="300" step="50">
+                <span class="slider-value" id="img-max-size-val">300</span>
+            </div>
+            <p class="hint">Меньше = легче код. 300px достаточно для игры.</p>
+
+            <label>Качество JPEG/WebP (1–100)</label>
+            <div class="slider-container">
+                <input type="range" id="img-quality" min="20" max="95" value="70">
+                <span class="slider-value" id="img-quality-val">70</span>
+            </div>
+            <p class="hint">70 = хороший баланс качество/размер.</p>
+        </div>
+
+        <div id="total-size-display" style="margin-top:10px; font-size:12px; color:#64748b; text-align:center;">
+            Общий размер кода: <strong id="total-size-val">—</strong>
+        </div>
+    </div>
+
+    <!-- 1. ОБЩИЕ НАСТРОЙКИ -->
+    <div class="group">
+        <div class="group-title">1. Общие настройки</div>
+        <label>Название игры</label>
+        <input type="text" id="game-title" value="PAST SIMPLE CHALLENGE">
+        <label>Приветственный текст</label>
+        <textarea id="welcome-text" rows="2">Готовы проверить свои знания?</textarea>
+        <div class="checkbox-row">
+            <input type="checkbox" id="enable-countdown" checked>
+            <label style="margin:0;">Обратный отсчёт 3-2-1-GO</label>
+        </div>
+    </div>
+
+    <!-- 2. ГРАФИКА -->
+    <div class="group">
+        <div class="group-title">2. Графика</div>
+
+        <label>Персонаж (лягушка/герой)</label>
+        <div class="file-upload-wrap">
+            <div class="file-upload-btn" id="btn-hero">
+                <img class="file-thumb" id="thumb-hero">
+                <span class="file-name">📂 Выбрать файл...</span>
+                <span class="size-badge" id="sz-hero"></span>
+                <button class="file-clear" onclick="clearFile('hero', event)">✕</button>
+            </div>
+            <input type="file" id="img-hero" accept="image/*" onchange="loadImage('hero', this)">
+        </div>
+
+        <label>Платформа (лист/астероид)</label>
+        <div class="file-upload-wrap">
+            <div class="file-upload-btn" id="btn-platform">
+                <img class="file-thumb" id="thumb-platform">
+                <span class="file-name">📂 Выбрать файл...</span>
+                <span class="size-badge" id="sz-platform"></span>
+                <button class="file-clear" onclick="clearFile('platform', event)">✕</button>
+            </div>
+            <input type="file" id="img-platform" accept="image/*" onchange="loadImage('platform', this)">
+        </div>
+
+        <label>Фон игры</label>
+        <div class="file-upload-wrap">
+            <div class="file-upload-btn" id="btn-bg">
+                <img class="file-thumb" id="thumb-bg">
+                <span class="file-name">📂 Выбрать файл...</span>
+                <span class="size-badge" id="sz-bg"></span>
+                <button class="file-clear" onclick="clearFile('bg', event)">✕</button>
+            </div>
+            <input type="file" id="img-bg" accept="image/*" onchange="loadImage('bg', this)">
+        </div>
+
+        <label>Иконка жизни</label>
+        <div class="file-upload-wrap">
+            <div class="file-upload-btn" id="btn-life">
+                <img class="file-thumb" id="thumb-life">
+                <span class="file-name">📂 Выбрать файл...</span>
+                <span class="size-badge" id="sz-life"></span>
+                <button class="file-clear" onclick="clearFile('life', event)">✕</button>
+            </div>
+            <input type="file" id="img-life" accept="image/*" onchange="loadImage('life', this)">
+        </div>
+
+        <label>Персонаж на экране победы (радостный)</label>
+        <div class="file-upload-wrap">
+            <div class="file-upload-btn" id="btn-victory-hero">
+                <img class="file-thumb" id="thumb-victory-hero">
+                <span class="file-name">📂 Выбрать файл...</span>
+                <span class="size-badge" id="sz-victory-hero"></span>
+                <button class="file-clear" onclick="clearFile('victory-hero', event)">✕</button>
+            </div>
+            <input type="file" id="img-victory-hero" accept="image/*" onchange="loadImage('victory-hero', this)">
+        </div>
+    </div>
+
+    <!-- 3. ЦВЕТА -->
+    <div class="group">
+        <div class="group-title">3. Цвета и стиль</div>
+
+        <label>Цвет рамки вопроса</label>
+        <div class="color-picker-row">
+            <input type="color" id="color-question-border" value="#6ab04c" oninput="syncHex(this,'color-question-border-hex')">
+            <input type="text" id="color-question-border-hex" value="#6ab04c" maxlength="7" oninput="syncColor(this,'color-question-border')">
+        </div>
+
+        <label>Цвет подсветки персонажа</label>
+        <div class="color-picker-row">
+            <input type="color" id="color-glow" value="#ffffff" oninput="syncHex(this,'color-glow-hex')">
+            <input type="text" id="color-glow-hex" value="#ffffff" maxlength="7" oninput="syncColor(this,'color-glow')">
+        </div>
+
+        <label>Цвет прогресс-бара</label>
+        <div class="color-picker-row">
+            <input type="color" id="color-timer" value="#eb4d4b" oninput="syncHex(this,'color-timer-hex')">
+            <input type="text" id="color-timer-hex" value="#eb4d4b" maxlength="7" oninput="syncColor(this,'color-timer')">
+        </div>
+
+        <label>Цвет текста</label>
+        <div class="color-picker-row">
+            <input type="color" id="color-text" value="#ffffff" oninput="syncHex(this,'color-text-hex')">
+            <input type="text" id="color-text-hex" value="#ffffff" maxlength="7" oninput="syncColor(this,'color-text')">
+        </div>
+
+        <label>Размер текста ответов (px)</label>
+        <div class="slider-container">
+            <input type="range" id="answer-font-size" min="12" max="32" value="22" oninput="sliderVal(this,'answer-font-value')">
+            <span class="slider-value" id="answer-font-value">22</span>
+        </div>
+
+        <label>Размер персонажа (%)</label>
+        <div class="slider-container">
+            <input type="range" id="hero-size" min="40" max="160" value="100" oninput="sliderVal(this,'hero-size-value')">
+            <span class="slider-value" id="hero-size-value">100</span>
+        </div>
+
+        <label>Позиция персонажа на платформе (%)</label>
+        <div class="slider-container">
+            <input type="range" id="hero-vertical" min="0" max="100" value="70" oninput="sliderVal(this,'hero-vertical-value')">
+            <span class="slider-value" id="hero-vertical-value">70</span>
+        </div>
+        <p class="hint">0 = высоко над платформой, 100 = глубоко внутри</p>
+    </div>
+
+    <!-- 4. ИГРОВЫЕ ПАРАМЕТРЫ -->
+    <div class="group">
+        <div class="group-title">4. Игровые параметры</div>
+
+        <label>Язык интерфейса</label>
+        <select id="game-language">
+            <option value="ru">🇷🇺 Русский</option>
+            <option value="en">🇬🇧 English</option>
+            <option value="de">🇩🇪 Deutsch</option>
+        </select>
+
+        <label>Количество жизней</label>
+        <div class="slider-container">
+            <input type="range" id="lives-count" min="1" max="10" value="5" oninput="sliderVal(this,'lives-value')">
+            <span class="slider-value" id="lives-value">5</span>
+        </div>
+
+        <div class="checkbox-row">
+            <input type="checkbox" id="enable-timer" checked>
+            <label style="margin:0;">Включить таймер</label>
+        </div>
+
+        <label>Время на ответ (сек)</label>
+        <div class="slider-container">
+            <input type="range" id="timer-duration" min="5" max="60" value="15" step="5" oninput="sliderVal(this,'timer-value')">
+            <span class="slider-value" id="timer-value">15</span>
+        </div>
+
+        <div class="two-col">
+            <div>
+                <label>Кнопка Старт</label>
+                <input type="text" id="start-button-text" value="СТАРТ!">
+            </div>
+            <div>
+                <label>Кнопка Ещё раз</label>
+                <input type="text" id="retry-button-text" value="Ещё раз">
+            </div>
+        </div>
+
+        <div class="two-col">
+            <div>
+                <label>Текст победы</label>
+                <input type="text" id="victory-text" value="ПОБЕДА! 🎉">
+            </div>
+            <div>
+                <label>Текст поражения</label>
+                <input type="text" id="gameover-text" value="ИГРА ОКОНЧЕНА 😢">
+            </div>
+        </div>
+
+        <label>Сообщение победы (подзаголовок)</label>
+        <textarea id="victory-message" rows="2">Отличная работа! Ты справился!</textarea>
+
+        <label>Визуальный эффект победы</label>
+        <select id="victory-effect" onchange="toggleCustomEffect()">
+            <option value="fireworks">🎆 Салют</option>
+            <option value="confetti">🎊 Конфетти</option>
+            <option value="stars">⭐ Звёзды</option>
+            <option value="hearts">💖 Сердечки</option>
+            <option value="sparkles">✨ Искры</option>
+            <option value="bubbles">🫧 Пузыри</option>
+            <option value="rainbow">🌈 Радуга</option>
+            <option value="gold">💰 Золото</option>
+            <option value="diamonds">💎 Алмазы</option>
+            <option value="snow">❄️ Снег</option>
+            <option value="flowers">🌸 Цветы</option>
+            <option value="sunshine">☀️ Солнце</option>
+            <option value="magic">🔮 Магия</option>
+            <option value="custom">🖼️ Своя картинка</option>
+            <option value="none">— Без эффектов</option>
+        </select>
+
+        <div id="custom-effect-settings" style="display:none; margin-top:8px;">
+            <label>Картинка для эффекта</label>
+            <div class="file-upload-wrap">
+                <div class="file-upload-btn" id="btn-custom-particle">
+                    <img class="file-thumb" id="thumb-custom-particle">
+                    <span class="file-name">📂 Выбрать файл...</span>
+                    <span class="size-badge" id="sz-custom-particle"></span>
+                    <button class="file-clear" onclick="clearFile('custom-particle', event)">✕</button>
+                </div>
+                <input type="file" id="img-custom-particle" accept="image/*" onchange="loadImage('custom-particle', this)">
+            </div>
+            <label>Направление</label>
+            <select id="particle-direction">
+                <option value="down">⬇️ Вниз</option>
+                <option value="up">⬆️ Вверх</option>
+                <option value="left">⬅️ Влево</option>
+                <option value="right">➡️ Вправо</option>
+                <option value="random">🔀 Случайно</option>
+                <option value="explode">💥 Взрыв</option>
+                <option value="spiral">🌀 Спираль</option>
+            </select>
+        </div>
+
+        <label>Размер частиц (%)</label>
+        <div class="slider-container">
+            <input type="range" id="global-particle-size" min="30" max="200" value="100" oninput="sliderVal(this,'gps-val')">
+            <span class="slider-value" id="gps-val">100</span>
+        </div>
+        <label>Скорость частиц (%)</label>
+        <div class="slider-container">
+            <input type="range" id="global-particle-speed" min="20" max="300" value="100" oninput="sliderVal(this,'gpsp-val')">
+            <span class="slider-value" id="gpsp-val">100</span>
+        </div>
+        <label>Количество частиц (%)</label>
+        <div class="slider-container">
+            <input type="range" id="global-particle-count" min="10" max="300" value="100" oninput="sliderVal(this,'gpc-val')">
+            <span class="slider-value" id="gpc-val">100</span>
+        </div>
+    </div>
+
+    <!-- 5. АУДИО -->
+    <div class="group">
+        <div class="group-title">5. Звуковые эффекты</div>
+        <p class="hint" style="margin-bottom:8px;">⚠️ Аудио сильно увеличивает размер. Используйте короткие MP3 (1–3 сек).</p>
+        <div class="audio-grid">
+            <div class="audio-item">
+                <span class="audio-label">🎬 Старт</span>
+                <div class="file-upload-wrap" style="margin:0">
+                    <div class="file-upload-btn" id="btn-snd-start" style="padding:5px 10px;">
+                        <span class="file-name" style="font-size:11px;">📂 файл...</span>
+                        <span class="size-badge" id="sz-snd-start"></span>
+                        <button class="file-clear" onclick="clearFile('snd-start', event)">✕</button>
+                    </div>
+                    <input type="file" id="audio-start" accept="audio/*" onchange="loadAudio('snd-start', this)">
+                </div>
+            </div>
+            <div class="audio-item">
+                <span class="audio-label">🐸 Прыжок</span>
+                <div class="file-upload-wrap" style="margin:0">
+                    <div class="file-upload-btn" id="btn-snd-jump" style="padding:5px 10px;">
+                        <span class="file-name" style="font-size:11px;">📂 файл...</span>
+                        <span class="size-badge" id="sz-snd-jump"></span>
+                        <button class="file-clear" onclick="clearFile('snd-jump', event)">✕</button>
+                    </div>
+                    <input type="file" id="audio-jump" accept="audio/*" onchange="loadAudio('snd-jump', this)">
+                </div>
+            </div>
+            <div class="audio-item">
+                <span class="audio-label">⚡ Ошибка</span>
+                <div class="file-upload-wrap" style="margin:0">
+                    <div class="file-upload-btn" id="btn-snd-shock" style="padding:5px 10px;">
+                        <span class="file-name" style="font-size:11px;">📂 файл...</span>
+                        <span class="size-badge" id="sz-snd-shock"></span>
+                        <button class="file-clear" onclick="clearFile('snd-shock', event)">✕</button>
+                    </div>
+                    <input type="file" id="audio-shock" accept="audio/*" onchange="loadAudio('snd-shock', this)">
+                </div>
+            </div>
+            <div class="audio-item">
+                <span class="audio-label">💀 Проигрыш</span>
+                <div class="file-upload-wrap" style="margin:0">
+                    <div class="file-upload-btn" id="btn-snd-lose" style="padding:5px 10px;">
+                        <span class="file-name" style="font-size:11px;">📂 файл...</span>
+                        <span class="size-badge" id="sz-snd-lose"></span>
+                        <button class="file-clear" onclick="clearFile('snd-lose', event)">✕</button>
+                    </div>
+                    <input type="file" id="audio-lose" accept="audio/*" onchange="loadAudio('snd-lose', this)">
+                </div>
+            </div>
+            <div class="audio-item">
+                <span class="audio-label">🏆 Победа</span>
+                <div class="file-upload-wrap" style="margin:0">
+                    <div class="file-upload-btn" id="btn-snd-win" style="padding:5px 10px;">
+                        <span class="file-name" style="font-size:11px;">📂 файл...</span>
+                        <span class="size-badge" id="sz-snd-win"></span>
+                        <button class="file-clear" onclick="clearFile('snd-win', event)">✕</button>
+                    </div>
+                    <input type="file" id="audio-win" accept="audio/*" onchange="loadAudio('snd-win', this)">
+                </div>
+            </div>
+            <div class="audio-item">
+                <span class="audio-label">⬆️ Уровень</span>
+                <div class="file-upload-wrap" style="margin:0">
+                    <div class="file-upload-btn" id="btn-snd-level" style="padding:5px 10px;">
+                        <span class="file-name" style="font-size:11px;">📂 файл...</span>
+                        <span class="size-badge" id="sz-snd-level"></span>
+                        <button class="file-clear" onclick="clearFile('snd-level', event)">✕</button>
+                    </div>
+                    <input type="file" id="audio-level" accept="audio/*" onchange="loadAudio('snd-level', this)">
+                </div>
+            </div>
+            <div class="audio-item">
+                <span class="audio-label">🔢 Отсчёт</span>
+                <div class="file-upload-wrap" style="margin:0">
+                    <div class="file-upload-btn" id="btn-snd-countdown" style="padding:5px 10px;">
+                        <span class="file-name" style="font-size:11px;">📂 файл...</span>
+                        <span class="size-badge" id="sz-snd-countdown"></span>
+                        <button class="file-clear" onclick="clearFile('snd-countdown', event)">✕</button>
+                    </div>
+                    <input type="file" id="audio-countdown" accept="audio/*" onchange="loadAudio('snd-countdown', this)">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 6. ВОПРОСЫ -->
+    <div class="group">
+        <div class="group-title">6. Уровни и вопросы</div>
+
+        <label>Количество уровней</label>
+        <div class="slider-container">
+            <input type="range" id="levels-count" min="1" max="5" value="3" oninput="onLevelsChange(this.value)">
+            <span class="slider-value" id="levels-value">3</span>
+        </div>
+
+        <div class="levels-grid" id="levels-tabs"></div>
+
+        <div style="background:var(--panel); padding:12px; border-radius:8px; margin:10px 0; border:1px solid var(--border);">
+            <label style="margin-top:0; color:var(--accent);">📝 Ввод вопросов (по одному на строку)</label>
+            <p class="hint" style="margin-bottom:8px;">
+                <strong>Формат:</strong> вопрос | правильный | неправильный1 | неправильный2<br>
+                <strong>Пример:</strong> She ___ a book|reads|read|reading
+            </p>
+            <textarea id="questions-input" rows="8" placeholder="She ___ a book|reads|read|reading
+I ___ to school|went|go|goes
+They ___ happy|were|was|are"></textarea>
+            <button class="btn btn-purple" style="margin-top:8px;" onclick="parseQuestions()">✓ Применить вопросы</button>
+        </div>
+
+        <div id="questions-preview"></div>
+    </div>
+
+    <!-- ДЕЙСТВИЯ -->
+    <button class="btn btn-green" onclick="updatePreview()">▶ Обновить предпросмотр</button>
+    <button class="btn btn-blue" onclick="copyForGenially()">📋 Скопировать для Genially</button>
+    <button class="btn btn-purple" style="margin-bottom:8px;" onclick="downloadGame()">💾 Скачать HTML (полная версия)</button>
+</div>
+
+<!-- PREVIEW -->
+<div id="preview-area">
+    <div id="preview-header">
+        <h3>📺 Предпросмотр</h3>
+        <span id="size-display" class="size-info size-ok">—</span>
+    </div>
+    <iframe id="preview-frame"></iframe>
+    <div id="status-bar">
+        <span id="status-text">Готов к работе</span>
+    </div>
+</div>
+
+<script>
+// =====================================================
+// ГЛОБАЛЬНОЕ СОСТОЯНИЕ
+// =====================================================
+var currentLevel = 1;
+var gameData = { levels: {} };
+var previewTimer = null;
+
+// Хранилище оригиналов (для скачивания) и сжатых (для Genially)
+var assets = {}; // { key: { original: base64, compressed: base64, size: bytes, compSize: bytes } }
+
+// =====================================================
+// INIT
+// =====================================================
+window.onload = function() {
+    updateLevelsTabs(3);
+    switchLevel(1);
+    setupAutoPreview();
+    setTimeout(updatePreview, 300);
+};
+
+// =====================================================
+// СЛАЙДЕРЫ
+// =====================================================
+function sliderVal(el, valId) {
+    document.getElementById(valId).textContent = el.value;
+    schedulePreview();
+}
+
+// =====================================================
+// ЦВЕТА
+// =====================================================
+function syncHex(colorEl, hexId) {
+    document.getElementById(hexId).value = colorEl.value;
+    schedulePreview();
+}
+function syncColor(hexEl, colorId) {
+    if (/^#[0-9A-Fa-f]{6}$/.test(hexEl.value)) {
+        document.getElementById(colorId).value = hexEl.value;
+        schedulePreview();
+    }
+}
+
+// =====================================================
+// ЗАГРУЗКА ИЗОБРАЖЕНИЙ СО СЖАТИЕМ
+// =====================================================
+function loadImage(key, input) {
+    var file = input.files[0];
+    if (!file) return;
+
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        var originalData = e.target.result;
+
+        // Сжимаем
+        compressImage(originalData, function(compressedData) {
+            assets[key] = {
+                original: originalData,
+                compressed: compressedData,
+                origSize: originalData.length,
+                compSize: compressedData.length,
+                name: file.name
+            };
+
+            updateFileUI(key, compressedData, file.name);
+            updateSizeDisplay();
+            schedulePreview();
+        });
+    };
+    reader.readAsDataURL(file);
+}
+
+function compressImage(dataUrl, callback) {
+    var maxSize = parseInt(document.getElementById('img-max-size').value) || 300;
+    var quality = (parseInt(document.getElementById('img-quality').value) || 70) / 100;
+
+    var img = new Image();
+    img.onload = function() {
+        var canvas = document.createElement('canvas');
+        var w = img.width, h = img.height;
+        var scale = Math.min(1, maxSize / Math.max(w, h));
+        canvas.width = Math.round(w * scale);
+        canvas.height = Math.round(h * scale);
+
+        var ctx = canvas.getContext('2d');
+
+        // Если PNG с прозрачностью — сохраняем прозрачность
+        var isPng = dataUrl.startsWith('data:image/png');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+        if (isPng) {
+            // PNG — сохраняем формат (не теряем прозрачность)
+            callback(canvas.toDataURL('image/png'));
+        } else {
+            callback(canvas.toDataURL('image/jpeg', quality));
+        }
+    };
+    img.src = dataUrl;
+}
+
+function updateFileUI(key, dataUrl, name) {
+    var btn = document.getElementById('btn-' + key);
+    var thumb = document.getElementById('thumb-' + key);
+    var szBadge = document.getElementById('sz-' + key);
+
+    if (!btn) return;
+
+    btn.classList.add('has-file');
+    var nameEl = btn.querySelector('.file-name');
+    if (nameEl) nameEl.textContent = name || 'файл загружен';
+
+    if (thumb) {
+        thumb.src = dataUrl;
+    }
+
+    if (szBadge && assets[key]) {
+        var kb = Math.round(assets[key].compSize / 1024);
+        var origKb = Math.round(assets[key].origSize / 1024);
+        szBadge.textContent = kb + 'KB';
+        if (kb > 100) szBadge.className = 'size-badge danger';
+        else if (kb > 50) szBadge.className = 'size-badge warn';
+        else szBadge.className = 'size-badge';
+
+        if (origKb > kb) {
+            szBadge.title = 'Исходный: ' + origKb + 'KB → Сжатый: ' + kb + 'KB';
+        }
+    }
+}
+
+function clearFile(key, event) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    delete assets[key];
+
+    var btn = document.getElementById('btn-' + key);
+    var thumb = document.getElementById('thumb-' + key);
+    var szBadge = document.getElementById('sz-' + key);
+
+    if (btn) {
+        btn.classList.remove('has-file');
+        var nameEl = btn.querySelector('.file-name');
+        if (nameEl) nameEl.textContent = '📂 Выбрать файл...';
+    }
+    if (thumb) { thumb.src = ''; }
+    if (szBadge) { szBadge.textContent = ''; szBadge.className = 'size-badge'; }
+
+    // Сбрасываем file input
+    var inputMap = {
+        'hero': 'img-hero', 'platform': 'img-platform', 'bg': 'img-bg',
+        'life': 'img-life', 'victory-hero': 'img-victory-hero',
+        'custom-particle': 'img-custom-particle'
+    };
+    if (inputMap[key]) {
+        var inp = document.getElementById(inputMap[key]);
+        if (inp) inp.value = '';
+    }
+
+    updateSizeDisplay();
+    schedulePreview();
+}
+
+// =====================================================
+// ЗАГРУЗКА АУДИО
+// =====================================================
+function loadAudio(key, input) {
+    var file = input.files[0];
+    if (!file) return;
+
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        var data = e.target.result;
+        assets[key] = {
+            original: data,
+            compressed: data, // аудио не сжимаем, используем как есть
+            origSize: data.length,
+            compSize: data.length,
+            name: file.name
+        };
+
+        var btn = document.getElementById('btn-' + key);
+        var szBadge = document.getElementById('sz-' + key);
+        var nameEl = btn ? btn.querySelector('.file-name') : null;
+
+        if (btn) btn.classList.add('has-file');
+        if (nameEl) nameEl.textContent = file.name;
+        if (szBadge) {
+            var kb = Math.round(data.length / 1024);
+            szBadge.textContent = kb + 'KB';
+            if (kb > 300) szBadge.className = 'size-badge danger';
+            else if (kb > 100) szBadge.className = 'size-badge warn';
+            else szBadge.className = 'size-badge';
+        }
+
+        updateSizeDisplay();
+        schedulePreview();
+    };
+    reader.readAsDataURL(file);
+}
+
+// =====================================================
+// РАЗМЕР
+// =====================================================
+function updateSizeDisplay() {
+    var total = 0;
+    Object.keys(assets).forEach(function(k) {
+        total += assets[k].compSize || 0;
+    });
+
+    var kb = Math.round(total / 1024);
+    var label = kb > 1024 ? (kb/1024).toFixed(1) + ' MB' : kb + ' KB';
+
+    var el = document.getElementById('total-size-val');
+    if (el) {
+        el.textContent = label;
+        if (kb > 500) el.style.color = '#f87171';
+        else if (kb > 200) el.style.color = '#f59e0b';
+        else el.style.color = '#22d3ee';
+    }
+
+    var disp = document.getElementById('size-display');
+    if (disp) {
+        disp.textContent = 'Ассеты: ' + label;
+        if (kb > 500) disp.className = 'size-info size-bad';
+        else if (kb > 200) disp.className = 'size-info size-warn';
+        else disp.className = 'size-info size-ok';
+    }
+}
+
+// =====================================================
+// ЭФФЕКТЫ
+// =====================================================
+function toggleCustomEffect() {
+    var v = document.getElementById('victory-effect').value;
+    document.getElementById('custom-effect-settings').style.display = v === 'custom' ? 'block' : 'none';
+}
+
+// =====================================================
+// LEVELS
+// =====================================================
+function onLevelsChange(val) {
+    document.getElementById('levels-value').textContent = val;
+    updateLevelsTabs(parseInt(val));
+    schedulePreview();
+}
+
+function updateLevelsTabs(count) {
+    var container = document.getElementById('levels-tabs');
+    container.innerHTML = '';
+    for (var i = 1; i <= count; i++) {
+        if (!gameData.levels[i]) gameData.levels[i] = [];
+        var tab = document.createElement('div');
+        tab.className = 'level-tab' + (i === currentLevel ? ' active' : '');
+        tab.textContent = 'Уровень ' + i;
+        (function(lvl) { tab.onclick = function() { switchLevel(lvl); }; })(i);
+        container.appendChild(tab);
+    }
+    // Удаляем лишние уровни
+    Object.keys(gameData.levels).forEach(function(k) {
+        if (parseInt(k) > count) delete gameData.levels[k];
+    });
+}
+
+function switchLevel(level) {
+    currentLevel = level;
+    document.querySelectorAll('.level-tab').forEach(function(t, idx) {
+        t.classList.toggle('active', idx + 1 === level);
+    });
+    // Восстанавливаем textarea
+    var qs = gameData.levels[currentLevel] || [];
+    document.getElementById('questions-input').value = qs.map(function(q) {
+        var wrong = q.options.filter(function(_, i) { return i !== q.correct; });
+        return q.question + '|' + q.options[q.correct] + '|' + wrong.join('|');
+    }).join('\n');
+    updateQuestionsPreview();
+}
+
+// =====================================================
+// ВОПРОСЫ
+// =====================================================
+function parseQuestions() {
+    var lines = document.getElementById('questions-input').value
+        .split('\n')
+        .filter(function(l) { return l.trim() && l.includes('|'); });
+
+    gameData.levels[currentLevel] = lines.map(function(line) {
+        var parts = line.split('|').map(function(p) { return p.trim(); }).filter(Boolean);
+        if (parts.length < 3) return null;
+        var question = parts[0];
+        var correct = parts[1];
+        var wrong = parts.slice(2, 4);
+        while (wrong.length < 2) wrong.push('???');
+        return { question: question, options: [correct, wrong[0], wrong[1]], correct: 0 };
+    }).filter(Boolean);
+
+    updateQuestionsPreview();
+    schedulePreview();
+}
+
+function updateQuestionsPreview() {
+    var qs = gameData.levels[currentLevel] || [];
+    var container = document.getElementById('questions-preview');
+    if (qs.length === 0) {
+        container.innerHTML = '<p class="hint">Нет вопросов. Введите их выше и нажмите "Применить".</p>';
+        return;
+    }
+    container.innerHTML = '<div style="background:var(--panel);padding:10px;border-radius:8px;border:1px solid var(--border);font-size:12px;color:var(--accent);">✅ Загружено: ' + qs.length + ' вопросов<br><span style="color:#64748b;font-size:10px;">Используется 6 случайных за раунд. Ответы перемешиваются.</span></div>';
+}
+
+// =====================================================
+// AUTO PREVIEW
+// =====================================================
+function setupAutoPreview() {
+    document.querySelectorAll('#sidebar input:not([type="file"]), #sidebar select, #sidebar textarea').forEach(function(el) {
+        el.addEventListener('change', schedulePreview);
+        if (el.type === 'range' || el.tagName === 'SELECT' || el.tagName === 'TEXTAREA') {
+            el.addEventListener('input', schedulePreview);
+        }
+    });
+}
+
+function schedulePreview() {
+    clearTimeout(previewTimer);
+    previewTimer = setTimeout(updatePreview, 800);
+    setStatus('⏳ Обновляется...');
+}
+
+function setStatus(msg) {
+    var el = document.getElementById('status-text');
+    if (el) el.textContent = msg;
+}
+
+function updatePreview() {
+    try {
+        var html = buildGameHTML(false);
+        var iframe = document.getElementById('preview-frame');
+        var blob = new Blob([html], { type: 'text/html' });
+        var oldUrl = iframe.src;
+        iframe.src = URL.createObjectURL(blob);
+        if (oldUrl && oldUrl.startsWith('blob:')) URL.revokeObjectURL(oldUrl);
+        setStatus('✅ Обновлён — ' + new Date().toLocaleTimeString());
+    } catch(e) {
+        setStatus('❌ Ошибка: ' + e.message);
+    }
+}
+
+// =====================================================
+// HELPERS
+// =====================================================
+function gv(id, def) {
+    var el = document.getElementById(id);
+    return el ? (el.value || def || '') : (def || '');
+}
+function gb(id, def) {
+    var el = document.getElementById(id);
+    return el ? el.checked : (def !== undefined ? def : false);
+}
+function getAsset(key, forDownload) {
+    if (!assets[key]) return '';
+    return forDownload ? assets[key].original : assets[key].compressed;
+}
+
+// =====================================================
+// BUILD GAME HTML
+// =====================================================
+function buildGameHTML(forDownload) {
+    var title         = gv('game-title', 'GAME');
+    var welcomeText   = gv('welcome-text', 'Готовы?');
+    var startBtnText  = gv('start-button-text', 'СТАРТ!');
+    var retryBtnText  = gv('retry-button-text', 'Ещё раз');
+    var victoryText   = gv('victory-text', 'ПОБЕДА! 🎉');
+    var victoryMsg    = gv('victory-message', 'Отличная работа!');
+    var gameoverText  = gv('gameover-text', 'ИГРА ОКОНЧЕНА 😢');
+    var lang          = gv('game-language', 'ru');
+    var enableTimer   = gb('enable-timer', true);
+    var enableCd      = gb('enable-countdown', true);
+    var lives         = gv('lives-count', '5');
+    var timerDur      = gv('timer-duration', '15');
+    var ansFont       = gv('answer-font-size', '22');
+    var heroSize      = gv('hero-size', '100');
+    var heroV         = gv('hero-vertical', '70');
+    var colBorder     = gv('color-question-border', '#6ab04c');
+    var colGlow       = gv('color-glow', '#ffffff');
+    var colTimer      = gv('color-timer', '#eb4d4b');
+    var colText       = gv('color-text', '#ffffff');
+    var victEff       = gv('victory-effect', 'fireworks');
+    var pDir          = gv('particle-direction', 'down');
+    var gpSize        = gv('global-particle-size', '100');
+    var gpSpeed       = gv('global-particle-speed', '100');
+    var gpCount       = gv('global-particle-count', '100');
+
+    var imgHero       = getAsset('hero', forDownload);
+    var imgPlatform   = getAsset('platform', forDownload);
+    var imgBg         = getAsset('bg', forDownload);
+    var imgLife       = getAsset('life', forDownload);
+    var imgVictHero   = getAsset('victory-hero', forDownload);
+    var imgCustP      = getAsset('custom-particle', forDownload);
+
+    var sndStart      = getAsset('snd-start', forDownload);
+    var sndJump       = getAsset('snd-jump', forDownload);
+    var sndShock      = getAsset('snd-shock', forDownload);
+    var sndLose       = getAsset('snd-lose', forDownload);
+    var sndWin        = getAsset('snd-win', forDownload);
+    var sndLevel      = getAsset('snd-level', forDownload);
+    var sndCountdown  = getAsset('snd-countdown', forDownload);
+
+    var levelsBank = {};
+    Object.keys(gameData.levels).forEach(function(lvl) {
+        levelsBank[lvl] = gameData.levels[lvl].map(function(q) {
+            return { q: q.question, options: q.options, correct: q.correct };
+        });
+    });
+
+    var esc = function(s) {
+        return (s||'').replace(/\\/g,'\\\\').replace(/"/g,'\\"').replace(/\n/g,'\\n').replace(/\r/g,'');
+    };
+    var escHtml = function(s) {
+        return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    };
+
+    var countdownHTML = enableCd ? '<div id="countdown-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:3000;justify-content:center;align-items:center;"><div id="countdown-text" style="font-size:140px;color:' + colText + ';font-weight:900;text-shadow:0 0 30px rgba(0,0,0,.6);font-family:Arial;"></div></div>' : '';
+
+    var initCode = enableCd ? (
+        'var cov=document.getElementById("countdown-overlay");'+
+        'var ctxt=document.getElementById("countdown-text");'+
+        'document.getElementById("overlay").style.display="none";'+
+        'if(sounds.count){sounds.count.pause();sounds.count.currentTime=0;}'+
+        'currentLevel=1;step=0;lives='+lives+';updateLives();createPond();'+
+        'cov.style.display="flex";'+
+        'var csteps=["3","2","1",t.go];var ci=0;'+
+        'function showCount(){'+
+        'if(ci<csteps.length){'+
+        'ctxt.textContent=csteps[ci];'+
+        'ctxt.classList.remove("count-anim");void ctxt.offsetWidth;ctxt.classList.add("count-anim");'+
+        'if(ci<3&&sounds.count)playSound(sounds.count);'+
+        'ci++;setTimeout(showCount,1000);'+
+        '}else{cov.style.display="none";frog.style.opacity=1;startGameLogic();}}showCount();'
+    ) : (
+        'currentLevel=1;step=0;lives='+lives+';updateLives();createPond();'+
+        'document.getElementById("overlay").style.display="none";'+
+        'frog.style.opacity=1;startGameLogic();'
+    );
+
+    return '<!DOCTYPE html>\n<html lang="'+lang+'">\n<head>\n<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width,initial-scale=1.0">\n<title>'+escHtml(title)+'</title>\n<style>\n' +
+'*{box-sizing:border-box;margin:0;padding:0}\n' +
+':root{--ui:'+colBorder+';--glow:'+colGlow+';--timer:'+colTimer+';--tcol:'+colText+';}\n' +
+'html,body{width:100%;height:100%;overflow:hidden;font-family:Arial,sans-serif;' + (imgBg ? 'background:url("'+imgBg+'") no-repeat center/cover;' : 'background:#1a5276;') + '}\n' +
+'#start-screen{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:3000;display:flex;flex-direction:column;justify-content:center;align-items:center;color:var(--tcol);text-align:center;padding:20px;}\n' +
+'#start-screen h1{font-size:clamp(2em,5vw,3.5em);margin-bottom:18px;text-shadow:0 0 20px rgba(0,0,0,.9);}\n' +
+'#start-screen p{font-size:clamp(1em,2.5vw,1.6em);margin-bottom:28px;text-shadow:0 0 10px rgba(0,0,0,.8);}\n' +
+'#start-btn{padding:18px 56px;font-size:22px;font-weight:bold;background:var(--ui);color:#fff;border:none;border-radius:50px;cursor:pointer;text-transform:uppercase;box-shadow:0 8px 24px rgba(0,0,0,.5);transition:transform .3s,box-shadow .3s;}\n' +
+'#start-btn:hover{transform:scale(1.08) translateY(-4px);box-shadow:0 14px 36px rgba(0,0,0,.7);}\n' +
+'#ui{position:absolute;top:0;width:100%;z-index:1000;pointer-events:none;}\n' +
+'#header{background:var(--ui);color:#fff;padding:9px;text-align:center;font-weight:bold;font-size:clamp(12px,2vw,18px);pointer-events:auto;}\n' +
+'#lives-wrap{position:absolute;top:46px;left:16px;display:flex;gap:6px;pointer-events:auto;}\n' +
+'.life-icon{width:46px;height:46px;' + (imgLife ? 'background:url("'+imgLife+'") no-repeat center/contain;' : 'font-size:28px;line-height:46px;text-align:center;') + 'filter:drop-shadow(0 3px 5px rgba(0,0,0,.4));}\n' +
+(imgLife ? '' : '.life-icon::before{content:"❤️"}\n') +
+'#qbox{background:#fff;width:88%;max-width:520px;margin:8px auto;padding:12px 14px;border-radius:16px;text-align:center;box-shadow:0 6px 18px rgba(0,0,0,.3);pointer-events:auto;}\n' +
+'#q-text{font-size:clamp(13px,2.5vw,17px);color:#2c3e50;font-weight:bold;line-height:1.4;}\n' +
+'.tbar{width:100%;height:7px;background:#dfe6e9;border-radius:4px;margin-top:8px;overflow:hidden;' + (enableTimer ? '' : 'display:none;') + '}\n' +
+'#tfill{width:100%;height:100%;background:var(--timer);transition:width .1s linear;}\n' +
+'#world{position:absolute;inset:0;padding-top:56px;overflow:hidden;}\n' +
+'#pond{position:relative;width:100%;height:100%;overflow:hidden;}\n' +
+'.leaf{position:absolute;width:20vw;height:16vw;max-width:180px;max-height:150px;' + (imgPlatform ? 'background:url("'+imgPlatform+'") no-repeat center/contain;' : 'background:radial-gradient(circle,#27ae60,#1a7a40);border-radius:50%;') + 'display:flex;align-items:center;justify-content:center;opacity:.85;transform:scale(.85);transition:transform .4s,opacity .4s;padding:14px;text-align:center;font-size:'+ansFont+'px;color:#fff;font-weight:bold;text-shadow:1px 1px 3px rgba(0,0,0,.9),-1px -1px 3px rgba(0,0,0,.9);}\n' +
+'.leaf.active{opacity:1;transform:scale(1.1);z-index:10;cursor:pointer;filter:drop-shadow(0 0 14px var(--glow));}\n' +
+'.leaf.active::after{content:attr(data-letter);position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:#f1c40f;width:22px;height:22px;border-radius:50%;font-size:12px;display:flex;align-items:center;justify-content:center;font-weight:bold;color:#000;text-shadow:none;}\n' +
+'.leaf.active:not([data-letter])::after{display:none;}\n' +
+'@keyframes leafBounce{0%{transform:scale(1.1) translateY(0)}30%{transform:scale(1.05) translateY(7px)}60%{transform:scale(1.12) translateY(-3px)}100%{transform:scale(1.1) translateY(0)}}\n' +
+'.leaf-landed{animation:leafBounce .5s ease-out;}\n' +
+'#frog{opacity:0;position:absolute;width:calc(10vw*'+heroSize+'/100);height:calc(10vw*'+heroSize+'/100);max-width:calc(90px*'+heroSize+'/100);max-height:calc(90px*'+heroSize+'/100);' + (imgHero ? 'background:url("'+imgHero+'") no-repeat center/contain;' : 'font-size:calc(50px*'+heroSize+'/100);line-height:1;text-align:center;') + 'transform:translate(-50%,-'+heroV+'%) scale(1.15);filter:drop-shadow(0 8px 14px rgba(0,0,0,.5));z-index:999!important;transition:left .6s cubic-bezier(.47,1.21,.58,1),top .6s cubic-bezier(.47,1.21,.58,1),transform .3s;pointer-events:none;}\n' +
+(imgHero ? '' : '#frog::after{content:"🐸"}\n') +
+'.jumping-frog{filter:drop-shadow(0 28px 18px rgba(0,0,0,.35))!important;transform:translate(-50%,calc(-'+heroV+'% - 20%)) scale(1.4)!important;}\n' +
+'@keyframes shock{0%{transform:scale(1.1) translate(2px,2px);filter:brightness(1.6) hue-rotate(180deg)}25%{transform:scale(1.1) translate(-2px,-2px)}50%{transform:scale(1.1) translate(2px,-2px)}75%{transform:scale(1.1) translate(-2px,2px)}100%{transform:scale(1.1) translate(0,0);filter:brightness(1)}}\n' +
+'.shock{animation:shock .1s infinite;z-index:10!important;}\n' +
+'.splash{position:absolute;border:4px solid rgba(255,255,255,.6);border-radius:50%;transform:translate(-50%,-50%);pointer-events:none;animation:splAni .6s ease-out forwards;z-index:5;}\n' +
+'@keyframes splAni{0%{width:0;height:0;opacity:1;border-width:4px}100%{width:150px;height:80px;opacity:0;border-width:1px}}\n' +
+'#overlay{position:fixed;inset:0;background:transparent;z-index:2000;display:none;flex-direction:column;justify-content:center;align-items:center;}\n' +
+'.vmodal{background:rgba(255,255,255,.95);padding:36px;border-radius:20px;text-align:center;max-width:480px;box-shadow:0 20px 60px rgba(0,0,0,.5);}\n' +
+'.vmodal img{max-width:180px;max-height:180px;display:block;margin:0 auto 16px;}\n' +
+'.vmodal h1{color:#22c55e;font-size:2.2em;margin:0 0 12px;}\n' +
+'.vmodal p{color:#334;font-size:1.1em;margin:0 0 22px;line-height:1.5;}\n' +
+'.vmodal button{padding:14px 40px;font-size:17px;background:var(--ui);color:#fff;border:none;border-radius:10px;cursor:pointer;font-weight:bold;}\n' +
+'#gameover-screen{text-align:center;color:var(--tcol);text-shadow:2px 2px 4px rgba(0,0,0,.7);}\n' +
+'#gameover-screen h1{font-size:clamp(2em,5vw,3.5em);animation:bounceIn 1s ease-out;margin-bottom:20px;}\n' +
+'#gameover-screen button{padding:14px 42px;border-radius:28px;border:none;background:var(--ui);color:#fff;font-size:18px;cursor:pointer;font-weight:bold;}\n' +
+'@keyframes bounceIn{0%{opacity:0;transform:scale(.3)}20%{transform:scale(1.1)}40%{transform:scale(.9)}60%{opacity:1;transform:scale(1.03)}80%{transform:scale(.97)}100%{opacity:1;transform:scale(1)}}\n' +
+'@keyframes pondSlide{0%{transform:translateY(0);opacity:1}50%{transform:translateY(100vh);opacity:0}51%{transform:translateY(-100vh);opacity:0}100%{transform:translateY(0);opacity:1}}\n' +
+'.pond-transition{animation:pondSlide 1.2s ease-in-out;}\n' +
+'#fxCanvas{position:absolute;top:0;left:0;width:100%;height:100%;z-index:2001;pointer-events:none;}\n' +
+'#vol-ctrl{position:absolute;top:46px;right:14px;background:rgba(255,255,255,.92);padding:7px 13px;border-radius:22px;display:flex;align-items:center;gap:8px;z-index:2000;pointer-events:auto;box-shadow:0 3px 12px rgba(0,0,0,.2);border:2px solid var(--ui);}\n' +
+'#vol-slider{cursor:pointer;accent-color:var(--ui);width:72px;}\n' +
+'@keyframes countPulse{0%{transform:scale(.4);opacity:0}50%{transform:scale(1.3);opacity:1}100%{transform:scale(1);opacity:0}}\n' +
+'.count-anim{animation:countPulse .9s ease-out forwards;}\n' +
+'</style>\n</head>\n<body>\n\n' +
+
+'<div id="start-screen">\n' +
+'<h1>'+escHtml(title)+'</h1>\n' +
+'<p>'+escHtml(welcomeText)+'</p>\n' +
+'<button id="start-btn" onclick="hideStart()">'+escHtml(startBtnText)+'</button>\n' +
+'</div>\n\n' +
+
+countdownHTML + '\n\n' +
+
+'<div id="ui">\n' +
+'<div id="header">'+escHtml(title)+'</div>\n' +
+'<div id="lives-wrap"></div>\n' +
+'<div id="qbox"><div id="q-text"><b>'+escHtml(welcomeText)+'</b></div><div class="tbar"><div id="tfill"></div></div></div>\n' +
+'</div>\n\n' +
+
+'<div id="vol-ctrl"><span id="vol-icon">🔊</span><input type="range" id="vol-slider" min="0" max="1" step="0.1" value="0.5"></div>\n\n' +
+
+'<div id="world"><div id="pond"><div id="frog"></div></div></div>\n\n' +
+
+'<div id="overlay">\n' +
+'<div class="vmodal" id="victory-modal" style="display:none;">\n' +
+(imgVictHero ? '<img src="'+imgVictHero+'" alt="">\n' : '') +
+'<h1 id="v-title"></h1>\n' +
+'<p id="v-msg"></p>\n' +
+'<button onclick="initGame()">'+escHtml(retryBtnText)+'</button>\n' +
+'</div>\n' +
+'<div id="gameover-screen" style="display:none;">\n' +
+'<h1 id="go-text"></h1>\n' +
+'<button onclick="initGame()">'+escHtml(retryBtnText)+'</button>\n' +
+'</div>\n' +
+'<canvas id="fxCanvas"></canvas>\n' +
+'</div>\n\n' +
+
+'<script>\n' +
+'var LB='+JSON.stringify(levelsBank)+';\n' +
+'var TDUR='+timerDur+';\n' +
+'var ETIMER='+enableTimer+';\n' +
+'var VTXT='+JSON.stringify(victoryText)+';\n' +
+'var VMSG='+JSON.stringify(victoryMsg)+';\n' +
+'var GOTXT='+JSON.stringify(gameoverText)+';\n' +
+'var VEFF='+JSON.stringify(victEff)+';\n' +
+'var PDIR='+JSON.stringify(pDir)+';\n' +
+'var CPIMG='+JSON.stringify(imgCustP)+';\n' +
+'var GPS='+gpSize+'/100;\n' +
+'var GPSP='+gpSpeed+'/100;\n' +
+'var GPC='+gpCount+'/100;\n' +
+
+'var TR={ru:{level:"УРОВЕНЬ",question:"Вопрос",outOfTime:"Время вышло!",go:"ВПЕРЁД!"},en:{level:"LEVEL",question:"Question",outOfTime:"Out of time!",go:"GO!"},de:{level:"STUFE",question:"Frage",outOfTime:"Zeit ab!",go:"LOS!"}};\n' +
+'var t=TR["'+lang+'"];\n' +
+'var currentLevel=1,step=0,lives='+lives+',questions=[],timer=null,lastLeaf=null,gvol=0.5,jumping=false;\n' +
+
+'function mkAudio(src){if(!src)return null;try{return new Audio(src);}catch(e){return null;}}\n' +
+'var sounds={start:mkAudio('+JSON.stringify(sndStart)+'),jump:mkAudio('+JSON.stringify(sndJump)+'),shock:mkAudio('+JSON.stringify(sndShock)+'),lose:mkAudio('+JSON.stringify(sndLose)+'),win:mkAudio('+JSON.stringify(sndWin)+'),level:mkAudio('+JSON.stringify(sndLevel)+'),count:mkAudio('+JSON.stringify(sndCountdown)+')};\n' +
+'function playSound(s){if(!s)return;try{s.currentTime=0;s.volume=gvol;s.play();}catch(e){}}\n' +
+
+'document.getElementById("vol-slider").addEventListener("input",function(e){gvol=parseFloat(e.target.value);document.getElementById("vol-icon").textContent=gvol===0?"🔇":"🔊";});\n' +
+
+'var pond=document.getElementById("pond"),frog=document.getElementById("frog");\n' +
+'var fxC=document.getElementById("fxCanvas"),ctx=fxC.getContext("2d");\n' +
+'function szC(){fxC.width=innerWidth;fxC.height=innerHeight;}window.addEventListener("resize",szC);szC();\n' +
+
+'function hideStart(){document.getElementById("start-screen").style.display="none";initGame();}\n' +
+
+'function createPond(){pond.querySelectorAll(".leaf").forEach(function(l){l.remove();});var R=7,C=5;for(var r=0;r<R;r++)for(var c=1;c<4;c++){var l=document.createElement("div");l.className="leaf";var cw=100/(C-1),off=(r%2===0)?0:cw/2,lp=50+((c*cw+off)-62.5)*1.2;l.style.left=lp+"%";l.style.top=((r/(R-1))*68+12)+"%";l.id="leaf-"+r+"-"+c;pond.appendChild(l);}}\n' +
+
+'function initGame(){pond.classList.remove("pond-transition");'+initCode+'}\n' +
+
+'function shuffle(a){var b=[].concat(a);for(var i=b.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var x=b[i];b[i]=b[j];b[j]=x;}return b;}\n' +
+
+'function startGameLogic(){\n' +
+'playSound(sounds.start);\n' +
+'document.getElementById("header").textContent='+JSON.stringify(title)+' + " - " + t.level + " " + currentLevel;\n' +
+'var qs=shuffle(LB[currentLevel]||[]).slice(0,6);\n' +
+'questions=qs.map(function(q){var opts=shuffle([].concat(q.options));return{q:q.q,options:opts,correct:opts.indexOf(q.options[q.correct])};});\n' +
+'frog.classList.remove("sink","super-jump","shock");\n' +
+'lastLeaf=document.getElementById("leaf-6-2");\n' +
+'document.querySelectorAll(".leaf").forEach(function(l){l.classList.remove("active","leaf-landed","shock");});\n' +
+'if(lastLeaf)lastLeaf.classList.add("active");\n' +
+'frog.style.transition="none";mvFrog(lastLeaf);\n' +
+'setTimeout(function(){frog.style.transition="left .6s cubic-bezier(.47,1.21,.58,1),top .6s cubic-bezier(.47,1.21,.58,1),transform .3s";loadLevel();},50);\n' +
+'}\n' +
+
+'function updateLives(){var c=document.getElementById("lives-wrap");c.innerHTML="";for(var i=0;i<lives;i++){var d=document.createElement("div");d.className="life-icon";c.appendChild(d);}}\n' +
+
+'function loadLevel(){\n' +
+'jumping=false;\n' +
+'if(step>=questions.length){\n' +
+'var nxt=currentLevel+1;\n' +
+'if(LB[nxt]&&LB[nxt].length>0){\n' +
+'frog.classList.add("super-jump");playSound(sounds.level);\n' +
+'setTimeout(function(){\n' +
+'pond.classList.add("pond-transition");\n' +
+'setTimeout(function(){\n' +
+'currentLevel++;step=0;\n' +
+'var qs2=shuffle(LB[currentLevel]||[]).slice(0,6);\n' +
+'questions=qs2.map(function(q){var opts=shuffle([].concat(q.options));return{q:q.q,options:opts,correct:opts.indexOf(q.options[q.correct])};});\n' +
+'document.getElementById("header").textContent='+JSON.stringify(title)+' + " - " + t.level + " " + currentLevel;\n' +
+'frog.classList.remove("super-jump");frog.style.transition="none";\n' +
+'lastLeaf=document.getElementById("leaf-6-2");mvFrog(lastLeaf);\n' +
+'setTimeout(function(){pond.classList.remove("pond-transition");frog.style.transition="left .6s cubic-bezier(.47,1.21,.58,1),top .6s cubic-bezier(.47,1.21,.58,1),transform .3s";loadLevel();},50);\n' +
+'},600);},400);return;\n' +
+'}showEnd(VTXT);return;}\n' +
+
+'document.querySelectorAll(".leaf.active").forEach(function(l){l.classList.remove("active","leaf-landed");l.textContent="";l.onclick=null;delete l.dataset.letter;});\n' +
+'if(lastLeaf)lastLeaf.classList.add("active");\n' +
+'var q=questions[step];\n' +
+'document.getElementById("q-text").innerHTML="<b>"+t.question+" "+(step+1)+":</b> "+q.q;\n' +
+'var row=5-step;\n' +
+'[1,2,3].forEach(function(c,i){var lf=document.getElementById("leaf-"+row+"-"+c);if(lf){lf.classList.add("active");lf.dataset.letter=String.fromCharCode(65+i);lf.textContent=q.options[i];(function(idx,leaf){lf.onclick=function(){hJump(idx,leaf);};})(i,lf);}});\n' +
+'if(ETIMER)startTimer();\n' +
+'}\n' +
+
+'function hJump(i,leaf){\n' +
+'if(jumping)return;jumping=true;clearInterval(timer);mvFrog(leaf);\n' +
+'if(i===questions[step].correct){\n' +
+'lastLeaf=leaf;leaf.classList.add("leaf-landed");playSound(sounds.jump);\n' +
+'setTimeout(function(){var x=leaf.offsetLeft+leaf.offsetWidth/2,y=leaf.offsetTop+leaf.offsetHeight/2;mkSplash(x,y);},300);\n' +
+'setTimeout(function(){step++;jumping=false;loadLevel();},700);\n' +
+'}else{\n' +
+'playSound(sounds.shock);leaf.classList.add("shock");frog.classList.add("shock");\n' +
+'lives--;updateLives();\n' +
+'setTimeout(function(){\n' +
+'mvFrog(lastLeaf);\n' +
+'setTimeout(function(){leaf.classList.remove("shock");frog.classList.remove("shock");},300);\n' +
+'if(lives<=0)showEnd(GOTXT);\n' +
+'else setTimeout(function(){jumping=false;loadLevel();},400);\n' +
+'},150);\n' +
+'}}\n' +
+
+'function mkSplash(x,y){var s=document.createElement("div");s.className="splash";s.style.left=x+"px";s.style.top=y+"px";pond.appendChild(s);setTimeout(function(){s.remove();},600);}\n' +
+
+'function mvFrog(leaf){if(!leaf||frog.classList.contains("super-jump"))return;frog.style.zIndex="999";frog.classList.add("jumping-frog");frog.style.left=(leaf.offsetLeft+leaf.offsetWidth/2)+"px";frog.style.top=(leaf.offsetTop+leaf.offsetHeight/2)+"px";setTimeout(function(){frog.classList.remove("jumping-frog");},600);}\n' +
+
+'function startTimer(){var pct=100;clearInterval(timer);timer=setInterval(function(){pct-=(100/(TDUR*10));document.getElementById("tfill").style.width=Math.max(0,pct)+"%";if(pct<=0){clearInterval(timer);onTimeout();}},100);}\n' +
+
+'function onTimeout(){playSound(sounds.shock);frog.classList.add("shock");lives--;updateLives();setTimeout(function(){frog.classList.remove("shock");if(lives<=0)showEnd(GOTXT);else{jumping=false;loadLevel();}},800);}\n' +
+
+// PARTICLES — компактная версия
+'var parts=[],animId=null;\n' +
+'function mkP(type,x,y){\n' +
+'var p={x:x||Math.random()*fxC.width,y:y||Math.random()*fxC.height,a:1};\n' +
+'if(type==="fire"){var ang=Math.random()*Math.PI*2,sp=(Math.random()*5+2)*GPSP;p.vx=Math.cos(ang)*sp;p.vy=Math.sin(ang)*sp;p.col="hsl("+(Math.random()*360)+",100%,50%)";p.dec=Math.random()*.03+.01;p.t="fire";}\n' +
+'else if(type==="conf"){p.x=Math.random()*fxC.width;p.y=-20;p.sz=(Math.random()*10+5)*GPS;p.vx=(Math.random()*4-2)*GPSP;p.vy=(Math.random()*5+3)*GPSP;p.rot=Math.random()*360;p.rs=(Math.random()*10-5)*GPSP;p.col="hsl("+(Math.floor(Math.random()*360))+",100%,50%)";p.dec=0;p.t="conf";}\n' +
+'else if(type==="star"){p.x=Math.random()*fxC.width;p.y=-20;p.sz=(Math.random()*8+4)*GPS;p.vy=(Math.random()*3+2)*GPSP;p.tw=Math.random()*Math.PI*2;p.dec=0;p.t="star";}\n' +
+'else if(type==="heart"){p.sz=(Math.random()*28+18)*GPS;p.vx=(Math.random()*2-1)*GPSP;p.vy=(Math.random()*-3-1)*GPSP;p.g=.12*GPSP;p.rot=Math.random()*360;p.rs=(Math.random()*4-2)*GPSP;p.a=Math.random()*.4+.3;p.hue=Math.floor(Math.random()*60+300);p.dec=0;p.t="heart";}\n' +
+'else if(type==="bubble"){p.x=Math.random()*fxC.width;p.y=fxC.height+20;p.sz=(Math.random()*28+10)*GPS;p.vx=(Math.random()*2-1)*GPSP;p.vy=(Math.random()*2+1)*-GPSP;p.a=Math.random()*.4+.3;p.wb=Math.random()*Math.PI*2;p.dec=0;p.t="bubble";}\n' +
+'else if(type==="coin"){p.x=Math.random()*fxC.width;p.y=-20;p.sz=(Math.random()*18+12)*GPS;p.vx=(Math.random()*2-1)*GPSP;p.vy=(Math.random()*4+2)*GPSP;p.flip=0;p.fs=(.05+Math.random()*.03)*GPSP;p.dec=0;p.t="coin";}\n' +
+'else if(type==="snow"){p.x=Math.random()*fxC.width;p.y=-20;p.sz=(Math.random()*6+3)*GPS;p.vx=(Math.random()*2-1)*GPSP;p.vy=(Math.random()*2+1)*GPSP;p.rot=Math.random()*360;p.rs=(Math.random()*2-1)*GPSP;p.a=Math.random()*.5+.5;p.dec=0;p.t="snow";}\n' +
+'else if(type==="flower"){p.x=Math.random()*fxC.width;p.y=-20;p.sz=(Math.random()*14+8)*GPS;p.vx=(Math.random()*2-1)*GPSP;p.vy=(Math.random()*2+1)*GPSP;p.rot=Math.random()*360;p.rs=(Math.random()*4-2)*GPSP;p.a=Math.random()*.6+.4;p.hue=Math.floor(Math.random()*60+300);p.dec=0;p.t="flower";}\n' +
+'else if(type==="custom"){var bs=5*GPSP,dir=PDIR;p.sz=40*GPS;p.rot=Math.random()*360;p.rs=(Math.random()*4-2)*GPSP;p.a=Math.random()*.5+.5;if(dir==="down"){p.x=Math.random()*fxC.width;p.y=-p.sz;p.vx=(Math.random()*2-1)*bs;p.vy=bs;}else if(dir==="up"){p.x=Math.random()*fxC.width;p.y=fxC.height+p.sz;p.vx=(Math.random()*2-1)*bs;p.vy=-bs;}else if(dir==="explode"){p.x=fxC.width/2;p.y=fxC.height/2;var ang2=Math.random()*Math.PI*2;p.vx=Math.cos(ang2)*bs;p.vy=Math.sin(ang2)*bs;}else{p.x=Math.random()*fxC.width;p.y=Math.random()*fxC.height;p.vx=(Math.random()-.5)*bs*2;p.vy=(Math.random()-.5)*bs*2;}p.dec=0;p.t="custom";}\n' +
+'return p;}\n' +
+
+'function drawP(p){\n' +
+'ctx.save();ctx.globalAlpha=p.a;\n' +
+'if(p.t==="fire"){ctx.beginPath();ctx.arc(p.x,p.y,2,0,Math.PI*2);ctx.fillStyle=p.col;ctx.fill();}\n' +
+'else if(p.t==="conf"){ctx.translate(p.x,p.y);ctx.rotate(p.rot*Math.PI/180);ctx.fillStyle=p.col;ctx.fillRect(-p.sz/2,-p.sz/2,p.sz,p.sz);}\n' +
+'else if(p.t==="star"){ctx.globalAlpha=p.a*(Math.sin(p.tw)*.3+.7);ctx.fillStyle="#FFD700";ctx.beginPath();for(var i=0;i<5;i++){var a=(Math.PI*2*i)/5-Math.PI/2;ctx.lineTo(p.x+Math.cos(a)*p.sz,p.y+Math.sin(a)*p.sz);}ctx.closePath();ctx.fill();}\n' +
+'else if(p.t==="heart"){ctx.translate(p.x,p.y);ctx.rotate(p.rot*Math.PI/180);ctx.fillStyle="hsl("+p.hue+",100%,60%)";var s=p.sz;ctx.beginPath();ctx.moveTo(0,s/4);ctx.bezierCurveTo(-s/2,-s/4,-s,s/4,0,s);ctx.bezierCurveTo(s,s/4,s/2,-s/4,0,s/4);ctx.fill();}\n' +
+'else if(p.t==="bubble"){var g=ctx.createRadialGradient(p.x-p.sz/4,p.y-p.sz/4,0,p.x,p.y,p.sz);g.addColorStop(0,"rgba(255,255,255,.8)");g.addColorStop(.5,"rgba(173,216,230,.4)");g.addColorStop(1,"rgba(100,149,237,.2)");ctx.fillStyle=g;ctx.beginPath();ctx.arc(p.x,p.y,p.sz,0,Math.PI*2);ctx.fill();}\n' +
+'else if(p.t==="coin"){ctx.translate(p.x,p.y);ctx.scale(Math.abs(Math.cos(p.flip)),1);var g2=ctx.createRadialGradient(-p.sz*.3,-p.sz*.3,0,0,0,p.sz);g2.addColorStop(0,"#FFF9C4");g2.addColorStop(.4,"#FFD700");g2.addColorStop(.8,"#FFA500");g2.addColorStop(1,"#B8860B");ctx.fillStyle=g2;ctx.beginPath();ctx.arc(0,0,p.sz,0,Math.PI*2);ctx.fill();ctx.fillStyle="#B8860B";ctx.font="bold "+(p.sz*.9)+"px Arial";ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillText("$",0,0);}\n' +
+'else if(p.t==="snow"){ctx.translate(p.x,p.y);ctx.rotate(p.rot*Math.PI/180);ctx.strokeStyle="#FFF";ctx.lineWidth=2;for(var i=0;i<6;i++){ctx.save();ctx.rotate(Math.PI*2*i/6);ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(0,p.sz);ctx.stroke();ctx.restore();}}\n' +
+'else if(p.t==="flower"){ctx.translate(p.x,p.y);ctx.rotate(p.rot*Math.PI/180);ctx.fillStyle="hsl("+p.hue+",100%,70%)";for(var i=0;i<5;i++){ctx.save();ctx.rotate(Math.PI*2*i/5);ctx.beginPath();ctx.ellipse(0,-p.sz*.5,p.sz*.4,p.sz*.6,0,0,Math.PI*2);ctx.fill();ctx.restore();}ctx.fillStyle="#FFD700";ctx.beginPath();ctx.arc(0,0,p.sz*.3,0,Math.PI*2);ctx.fill();}\n' +
+'else if(p.t==="custom"&&cpImg&&cpImg.complete){ctx.translate(p.x,p.y);ctx.rotate(p.rot*Math.PI/180);ctx.drawImage(cpImg,-p.sz/2,-p.sz/2,p.sz,p.sz);}\n' +
+'ctx.restore();}\n' +
+
+'function updP(p){\n' +
+'if(p.t==="fire"){p.vx*=.99;p.vy*=.99;p.vy+=.05;p.x+=p.vx;p.y+=p.vy;p.a-=p.dec;}\n' +
+'else if(p.t==="conf"){p.vy+=.2*GPSP;p.x+=p.vx;p.y+=p.vy;p.rot+=p.rs;if(p.y>fxC.height)p.a-=.02;}\n' +
+'else if(p.t==="star"){p.y+=p.vy;p.tw+=.1;if(p.y>fxC.height)p.a-=.02;}\n' +
+'else if(p.t==="heart"){p.vy+=p.g;p.x+=p.vx;p.y+=p.vy;p.rot+=p.rs;if(p.y>fxC.height+50)p.a-=.01;}\n' +
+'else if(p.t==="bubble"){p.wb+=.1;p.x+=p.vx+Math.sin(p.wb)*.5;p.y+=p.vy;if(p.y<-p.sz)p.a-=.02;}\n' +
+'else if(p.t==="coin"){p.flip+=p.fs;p.y+=p.vy;p.x+=p.vx;if(p.y>fxC.height)p.a-=.02;}\n' +
+'else if(p.t==="snow"){p.y+=p.vy;p.x+=p.vx;p.rot+=p.rs;if(p.y>fxC.height)p.a-=.01;}\n' +
+'else if(p.t==="flower"){p.y+=p.vy;p.x+=p.vx;p.rot+=p.rs;if(p.y>fxC.height)p.a-=.01;}\n' +
+'else if(p.t==="custom"){p.x+=p.vx;p.y+=p.vy;p.rot+=p.rs;if(p.x<-p.sz||p.x>fxC.width+p.sz||p.y<-p.sz||p.y>fxC.height+p.sz)p.a-=.02;}\n' +
+'}\n' +
+
+'var cpImg=null;if(CPIMG){cpImg=new Image();cpImg.src=CPIMG;}\n' +
+
+'function spawnEff(eff){\n' +
+'var n=Math.max(1,Math.round(GPC));\n' +
+'if(eff==="fireworks"){var hue=Math.floor(Math.random()*360),col="hsl("+hue+",100%,50%)";for(var i=0;i<Math.round(50*n);i++)parts.push(mkP("fire",Math.random()*fxC.width,Math.random()*fxC.height*.7));}\n' +
+'else if(eff==="confetti"){for(var i=0;i<Math.round(10*n);i++)parts.push(mkP("conf"));}\n' +
+'else if(eff==="stars"){for(var i=0;i<Math.round(5*n);i++)parts.push(mkP("star"));}\n' +
+'else if(eff==="hearts"){for(var i=0;i<Math.round(4*n);i++)parts.push(mkP("heart"));}\n' +
+'else if(eff==="bubbles"){for(var i=0;i<Math.round(4*n);i++)parts.push(mkP("bubble"));}\n' +
+'else if(eff==="gold"||eff==="coins"){for(var i=0;i<Math.round(6*n);i++)parts.push(mkP("coin"));}\n' +
+'else if(eff==="snow"){for(var i=0;i<Math.round(6*n);i++)parts.push(mkP("snow"));}\n' +
+'else if(eff==="flowers"){for(var i=0;i<Math.round(3*n);i++)parts.push(mkP("flower"));}\n' +
+'else if(eff==="custom"){for(var i=0;i<Math.round(6*n);i++)parts.push(mkP("custom"));}\n' +
+'}\n' +
+
+'function animLoop(){animId=requestAnimationFrame(animLoop);ctx.clearRect(0,0,fxC.width,fxC.height);parts=parts.filter(function(p){updP(p);drawP(p);return p.a>0;});if(Math.random()<.1)spawnEff(VEFF);}\n' +
+'function stopFx(){cancelAnimationFrame(animId);animId=null;parts=[];ctx.clearRect(0,0,fxC.width,fxC.height);}\n' +
+
+'function showEnd(txt){\n' +
+'document.getElementById("overlay").style.display="flex";\n' +
+'if(txt===VTXT){\n' +
+'document.getElementById("victory-modal").style.display="block";\n' +
+'document.getElementById("gameover-screen").style.display="none";\n' +
+'document.getElementById("v-title").textContent=VTXT;\n' +
+'document.getElementById("v-msg").textContent=VMSG;\n' +
+'playSound(sounds.win);\n' +
+'if(VEFF!=="none"){fxC.style.display="block";animLoop();setTimeout(stopFx,6000);}\n' +
+'}else{\n' +
+'document.getElementById("victory-modal").style.display="none";\n' +
+'document.getElementById("gameover-screen").style.display="block";\n' +
+'document.getElementById("go-text").textContent=GOTXT;\n' +
+'playSound(sounds.lose);stopFx();fxC.style.display="none";\n' +
+'}}\n' +
+
+'<\/script>\n</body>\n</html>';
+}
+
+// =====================================================
+// COPY FOR GENIALLY
+// =====================================================
+function copyForGenially() {
+    setStatus('⏳ Генерируем код...');
+
+    setTimeout(function() {
+        try {
+            var html = buildGameHTML(false); // сжатые ассеты
+            var sizeKb = Math.round(new Blob([html]).size / 1024);
+
+            if (sizeKb > 800) {
+                var ok = confirm(
+                    '⚠️ Код весит ' + sizeKb + ' KB — это много для Genially!\n\n' +
+                    'Причина: большие аудио файлы или изображения.\n\n' +
+                    'Советы:\n• Уменьшите размер картинок (слайдер "Макс. размер")\n• Используйте короткие MP3 (1-3 сек)\n• Снизьте качество JPEG\n\nВсё равно скопировать?'
+                );
+                if (!ok) { setStatus('Отменено.'); return; }
+            }
+
+            var escaped = html
+                .replace(/&/g, '&amp;')
+                .replace(/'/g, '&apos;')
+                .replace(/"/g, '&quot;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+
+            var iframeCode = '<iframe srcdoc="' + escaped + '" width="100%" height="100%" frameborder="0" allowfullscreen style="border:none;width:100%;height:100%;display:block;"></iframe>';
+
+            navigator.clipboard.writeText(iframeCode).then(function() {
+                var label = sizeKb > 1024 ? (sizeKb/1024).toFixed(1) + ' MB' : sizeKb + ' KB';
+                var icon = sizeKb < 200 ? '✅' : sizeKb < 500 ? '⚠️' : '🔴';
+                alert(icon + ' Скопировано!\nРазмер: ' + label + '\n\n' +
+                    (sizeKb < 200 ? 'Отлично! Должно работать в Genially без проблем.' :
+                    sizeKb < 500 ? 'Средний размер. Возможна медленная загрузка в Genially.' :
+                    'Большой размер! Попробуйте уменьшить качество/размер картинок и аудио.'));
+                setStatus('✅ Скопировано (' + label + ')');
+            }).catch(function() {
+                // Fallback
+                var ta = document.createElement('textarea');
+                ta.value = iframeCode;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+                setStatus('✅ Скопировано (fallback)');
+                alert('✅ Код скопирован!');
+            });
+        } catch(e) {
+            setStatus('❌ Ошибка: ' + e.message);
+            alert('Ошибка: ' + e.message);
+        }
+    }, 50);
+}
+
+// =====================================================
+// DOWNLOAD FULL GAME
+// =====================================================
+function downloadGame() {
+    setStatus('⏳ Подготовка к скачиванию...');
+    setTimeout(function() {
+        try {
+            var html = buildGameHTML(true); // оригинальные ассеты
+            var blob = new Blob([html], { type: 'text/html' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = 'froggy-quest-game.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            setStatus('✅ Файл скачан');
+        } catch(e) {
+            setStatus('❌ Ошибка скачивания: ' + e.message);
+        }
+    }, 50);
+}
+</script>
+
+</body>
+</html>
