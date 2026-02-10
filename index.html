@@ -1280,28 +1280,22 @@ function buildGameHTML(forDownload) {
         'var cov=document.getElementById("countdown-overlay");'+
         'var ctxt=document.getElementById("countdown-text");'+
         'document.getElementById("overlay").style.display="none";'+
-        // Полностью останавливаем все звуки перед началом
         'Object.values(sounds).forEach(function(s){if(s){try{s.pause();s.currentTime=0;}catch(e){}}});'+
         'currentLevel=1;step=0;lives='+lives+';updateLives();createPond();'+
         'cov.style.display="flex";'+
         'var csteps=["3","2","1",t.go];var ci=0;'+
-        // Используем именованную функцию чтобы избежать дублирования при повторном вызове initGame
-        'if(window._cdTimer)clearInterval(window._cdTimer);'+
-        'ctxt.textContent=csteps[0];'+
-        'ctxt.classList.remove("count-anim");void ctxt.offsetWidth;ctxt.classList.add("count-anim");'+
+        'if(window._cdTimer)clearTimeout(window._cdTimer);'+
         'if(sounds.count){sounds.count.currentTime=0;sounds.count.volume=gvol;sounds.count.play().catch(function(){});}'+
-        'ci=1;'+
-        'window._cdTimer=setInterval(function(){'+
+        'function _showCd(){'+
         'if(ci<csteps.length){'+
         'ctxt.textContent=csteps[ci];'+
         'ctxt.classList.remove("count-anim");void ctxt.offsetWidth;ctxt.classList.add("count-anim");'+
-        // Звук только для цифр 2 и 1, не для GO
-        'if(ci<3&&sounds.count){sounds.count.currentTime=0;sounds.count.volume=gvol;sounds.count.play().catch(function(){});}'+
         'ci++;'+
+        'window._cdTimer=setTimeout(_showCd,1000);'+
         '}else{'+
-        'clearInterval(window._cdTimer);window._cdTimer=null;'+
-        'cov.style.display="none";frog.style.opacity=1;startGameLogic();}'+
-        '},1000);'
+        'if(sounds.count){sounds.count.pause();sounds.count.currentTime=0;}'+
+        'cov.style.display="none";frog.style.opacity=1;startGameLogic();}}'+
+        '_showCd();'
     ) : (
         'currentLevel=1;step=0;lives='+lives+';updateLives();createPond();'+
         'document.getElementById("overlay").style.display="none";'+
