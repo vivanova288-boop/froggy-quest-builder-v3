@@ -452,17 +452,18 @@ textarea#questions-input {
         <div class="compress-options">
             <label>Максимальный размер картинки (px)</label>
             <div class="slider-container">
-                <input type="range" id="img-max-size" min="100" max="800" value="300" step="50">
+                <input type="range" id="img-max-size" min="100" max="800" value="300" step="50" oninput="sliderVal(this,'img-max-size-val')">
                 <span class="slider-value" id="img-max-size-val">300</span>
             </div>
             <p class="hint">Меньше = легче код. 300px достаточно для игры.</p>
 
             <label>Качество JPEG/WebP (1–100)</label>
             <div class="slider-container">
-                <input type="range" id="img-quality" min="20" max="95" value="70">
+                <input type="range" id="img-quality" min="20" max="95" value="70" oninput="sliderVal(this,'img-quality-val')">
                 <span class="slider-value" id="img-quality-val">70</span>
             </div>
             <p class="hint">70 = хороший баланс качество/размер.</p>
+            <p class="hint" style="color:#22d3ee; margin-top:6px;">⚡ При изменении слайдеров картинки пересжимаются автоматически.</p>
         </div>
 
         <div id="total-size-display" style="margin-top:10px; font-size:12px; color:#64748b; text-align:center;">
@@ -859,7 +860,26 @@ window.onload = function() {
 // =====================================================
 function sliderVal(el, valId) {
     document.getElementById(valId).textContent = el.value;
+    // Если это слайдеры сжатия — пересжимаем все загруженные картинки
+    if (el.id === 'img-max-size' || el.id === 'img-quality') {
+        recompressAllImages();
+    }
     schedulePreview();
+}
+
+// Пересжать все уже загруженные картинки с новыми настройками
+function recompressAllImages() {
+    var imageKeys = ['hero', 'platform', 'bg', 'life', 'victory-hero', 'custom-particle'];
+    imageKeys.forEach(function(key) {
+        if (assets[key] && assets[key].original) {
+            compressImage(assets[key].original, function(compressedData) {
+                assets[key].compressed = compressedData;
+                assets[key].compSize = compressedData.length;
+                updateFileUI(key, compressedData, assets[key].name);
+            });
+        }
+    });
+    setTimeout(updateSizeDisplay, 200);
 }
 
 // =====================================================
@@ -1260,17 +1280,28 @@ function buildGameHTML(forDownload) {
         'var cov=document.getElementById("countdown-overlay");'+
         'var ctxt=document.getElementById("countdown-text");'+
         'document.getElementById("overlay").style.display="none";'+
-        'if(sounds.count){sounds.count.pause();sounds.count.currentTime=0;}'+
+        // Полностью останавливаем все звуки перед началом
+        'Object.values(sounds).forEach(function(s){if(s){try{s.pause();s.currentTime=0;}catch(e){}}});'+
         'currentLevel=1;step=0;lives='+lives+';updateLives();createPond();'+
         'cov.style.display="flex";'+
         'var csteps=["3","2","1",t.go];var ci=0;'+
-        'function showCount(){'+
+        // Используем именованную функцию чтобы избежать дублирования при повторном вызове initGame
+        'if(window._cdTimer)clearInterval(window._cdTimer);'+
+        'ctxt.textContent=csteps[0];'+
+        'ctxt.classList.remove("count-anim");void ctxt.offsetWidth;ctxt.classList.add("count-anim");'+
+        'if(sounds.count){sounds.count.currentTime=0;sounds.count.volume=gvol;sounds.count.play().catch(function(){});}'+
+        'ci=1;'+
+        'window._cdTimer=setInterval(function(){'+
         'if(ci<csteps.length){'+
         'ctxt.textContent=csteps[ci];'+
         'ctxt.classList.remove("count-anim");void ctxt.offsetWidth;ctxt.classList.add("count-anim");'+
-        'if(ci<3&&sounds.count)playSound(sounds.count);'+
-        'ci++;setTimeout(showCount,1000);'+
-        '}else{cov.style.display="none";frog.style.opacity=1;startGameLogic();}}showCount();'
+        // Звук только для цифр 2 и 1, не для GO
+        'if(ci<3&&sounds.count){sounds.count.currentTime=0;sounds.count.volume=gvol;sounds.count.play().catch(function(){});}'+
+        'ci++;'+
+        '}else{'+
+        'clearInterval(window._cdTimer);window._cdTimer=null;'+
+        'cov.style.display="none";frog.style.opacity=1;startGameLogic();}'+
+        '},1000);'
     ) : (
         'currentLevel=1;step=0;lives='+lives+';updateLives();createPond();'+
         'document.getElementById("overlay").style.display="none";'+
