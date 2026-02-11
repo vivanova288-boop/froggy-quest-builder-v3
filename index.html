@@ -437,6 +437,39 @@ textarea#questions-input {
 }
 
 .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+.audio-url-grid { display: grid; gap: 8px; }
+.audio-url-item label { margin: 0 0 3px; color: #94a3b8; font-size: 11px; display: block; }
+.audio-url-input {
+    flex: 1;
+    padding: 7px 10px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    color: #fff;
+    border-radius: 7px;
+    font-size: 11px;
+    font-family: 'Courier New', monospace;
+    min-width: 0;
+}
+.audio-url-input:focus { outline: none; border-color: var(--accent); }
+.audio-test-btn {
+    background: var(--accent);
+    color: #052e16;
+    border: none;
+    border-radius: 6px;
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+    font-size: 11px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    transition: background 0.2s;
+}
+.audio-test-btn:hover { background: var(--accent-hover); }
+.audio-test-btn.playing { background: #f59e0b; }
 </style>
 </head>
 <body>
@@ -707,86 +740,59 @@ textarea#questions-input {
     <!-- 5. АУДИО -->
     <div class="group">
         <div class="group-title">5. Звуковые эффекты</div>
-        <p class="hint" style="margin-bottom:8px;">⚠️ Аудио сильно увеличивает размер. Используйте короткие MP3 (1–3 сек).</p>
-        <div class="audio-grid">
-            <div class="audio-item">
-                <span class="audio-label">🎬 Старт</span>
-                <div class="file-upload-wrap" style="margin:0">
-                    <div class="file-upload-btn" id="btn-snd-start" style="padding:5px 10px;">
-                        <span class="file-name" style="font-size:11px;">📂 файл...</span>
-                        <span class="size-badge" id="sz-snd-start"></span>
-                        <button class="file-clear" onclick="clearFile('snd-start', event)">✕</button>
-                    </div>
-                    <input type="file" id="audio-start" accept="audio/*" onchange="loadAudio('snd-start', this)">
+        <p class="hint" style="margin-bottom:8px;">🔗 Вставьте прямую ссылку на MP3 или оставьте дефолтный. Ссылки <b>не увеличивают</b> размер кода!</p>
+        <div class="audio-url-grid">
+            <div class="audio-url-item">
+                <label>🎬 Старт</label>
+                <div style="display:flex;gap:4px;">
+                    <input type="text" id="url-snd-start" class="audio-url-input" value="https://raw.githubusercontent.com/vivanova288-boop/froggy-quest-builder-v3/main/1.mp3" placeholder="https://...mp3">
+                    <button class="audio-test-btn" onclick="testAudio('url-snd-start')" title="Прослушать">▶</button>
                 </div>
             </div>
-            <div class="audio-item">
-                <span class="audio-label">🐸 Прыжок</span>
-                <div class="file-upload-wrap" style="margin:0">
-                    <div class="file-upload-btn" id="btn-snd-jump" style="padding:5px 10px;">
-                        <span class="file-name" style="font-size:11px;">📂 файл...</span>
-                        <span class="size-badge" id="sz-snd-jump"></span>
-                        <button class="file-clear" onclick="clearFile('snd-jump', event)">✕</button>
-                    </div>
-                    <input type="file" id="audio-jump" accept="audio/*" onchange="loadAudio('snd-jump', this)">
+            <div class="audio-url-item">
+                <label>🐸 Прыжок (верно)</label>
+                <div style="display:flex;gap:4px;">
+                    <input type="text" id="url-snd-jump" class="audio-url-input" value="https://raw.githubusercontent.com/vivanova288-boop/froggy-quest-builder-v3/main/2.mp3" placeholder="https://...mp3">
+                    <button class="audio-test-btn" onclick="testAudio('url-snd-jump')" title="Прослушать">▶</button>
                 </div>
             </div>
-            <div class="audio-item">
-                <span class="audio-label">⚡ Ошибка</span>
-                <div class="file-upload-wrap" style="margin:0">
-                    <div class="file-upload-btn" id="btn-snd-shock" style="padding:5px 10px;">
-                        <span class="file-name" style="font-size:11px;">📂 файл...</span>
-                        <span class="size-badge" id="sz-snd-shock"></span>
-                        <button class="file-clear" onclick="clearFile('snd-shock', event)">✕</button>
-                    </div>
-                    <input type="file" id="audio-shock" accept="audio/*" onchange="loadAudio('snd-shock', this)">
+            <div class="audio-url-item">
+                <label>⚡ Ошибка</label>
+                <div style="display:flex;gap:4px;">
+                    <input type="text" id="url-snd-shock" class="audio-url-input" value="https://raw.githubusercontent.com/vivanova288-boop/froggy-quest-builder-v3/main/3.mp3" placeholder="https://...mp3">
+                    <button class="audio-test-btn" onclick="testAudio('url-snd-shock')" title="Прослушать">▶</button>
                 </div>
             </div>
-            <div class="audio-item">
-                <span class="audio-label">💀 Проигрыш</span>
-                <div class="file-upload-wrap" style="margin:0">
-                    <div class="file-upload-btn" id="btn-snd-lose" style="padding:5px 10px;">
-                        <span class="file-name" style="font-size:11px;">📂 файл...</span>
-                        <span class="size-badge" id="sz-snd-lose"></span>
-                        <button class="file-clear" onclick="clearFile('snd-lose', event)">✕</button>
-                    </div>
-                    <input type="file" id="audio-lose" accept="audio/*" onchange="loadAudio('snd-lose', this)">
+            <div class="audio-url-item">
+                <label>💀 Проигрыш</label>
+                <div style="display:flex;gap:4px;">
+                    <input type="text" id="url-snd-lose" class="audio-url-input" value="https://raw.githubusercontent.com/vivanova288-boop/froggy-quest-builder-v3/main/4.mp3" placeholder="https://...mp3">
+                    <button class="audio-test-btn" onclick="testAudio('url-snd-lose')" title="Прослушать">▶</button>
                 </div>
             </div>
-            <div class="audio-item">
-                <span class="audio-label">🏆 Победа</span>
-                <div class="file-upload-wrap" style="margin:0">
-                    <div class="file-upload-btn" id="btn-snd-win" style="padding:5px 10px;">
-                        <span class="file-name" style="font-size:11px;">📂 файл...</span>
-                        <span class="size-badge" id="sz-snd-win"></span>
-                        <button class="file-clear" onclick="clearFile('snd-win', event)">✕</button>
-                    </div>
-                    <input type="file" id="audio-win" accept="audio/*" onchange="loadAudio('snd-win', this)">
+            <div class="audio-url-item">
+                <label>🏆 Победа</label>
+                <div style="display:flex;gap:4px;">
+                    <input type="text" id="url-snd-win" class="audio-url-input" value="https://raw.githubusercontent.com/vivanova288-boop/froggy-quest-builder-v3/main/5.mp3" placeholder="https://...mp3">
+                    <button class="audio-test-btn" onclick="testAudio('url-snd-win')" title="Прослушать">▶</button>
                 </div>
             </div>
-            <div class="audio-item">
-                <span class="audio-label">⬆️ Уровень</span>
-                <div class="file-upload-wrap" style="margin:0">
-                    <div class="file-upload-btn" id="btn-snd-level" style="padding:5px 10px;">
-                        <span class="file-name" style="font-size:11px;">📂 файл...</span>
-                        <span class="size-badge" id="sz-snd-level"></span>
-                        <button class="file-clear" onclick="clearFile('snd-level', event)">✕</button>
-                    </div>
-                    <input type="file" id="audio-level" accept="audio/*" onchange="loadAudio('snd-level', this)">
+            <div class="audio-url-item">
+                <label>⬆️ Новый уровень</label>
+                <div style="display:flex;gap:4px;">
+                    <input type="text" id="url-snd-level" class="audio-url-input" value="https://raw.githubusercontent.com/vivanova288-boop/froggy-quest-builder-v3/main/6.mp3" placeholder="https://...mp3">
+                    <button class="audio-test-btn" onclick="testAudio('url-snd-level')" title="Прослушать">▶</button>
                 </div>
             </div>
-            <div class="audio-item">
-                <span class="audio-label">🔢 Отсчёт</span>
-                <div class="file-upload-wrap" style="margin:0">
-                    <div class="file-upload-btn" id="btn-snd-countdown" style="padding:5px 10px;">
-                        <span class="file-name" style="font-size:11px;">📂 файл...</span>
-                        <span class="size-badge" id="sz-snd-countdown"></span>
-                        <button class="file-clear" onclick="clearFile('snd-countdown', event)">✕</button>
-                    </div>
-                    <input type="file" id="audio-countdown" accept="audio/*" onchange="loadAudio('snd-countdown', this)">
+            <div class="audio-url-item">
+                <label>🔢 Отсчёт (3-2-1)</label>
+                <div style="display:flex;gap:4px;">
+                    <input type="text" id="url-snd-countdown" class="audio-url-input" value="https://raw.githubusercontent.com/vivanova288-boop/froggy-quest-builder-v3/main/7.mp3" placeholder="https://...mp3">
+                    <button class="audio-test-btn" onclick="testAudio('url-snd-countdown')" title="Прослушать">▶</button>
                 </div>
             </div>
         </div>
+        <p class="hint" style="margin-top:8px;">💡 Свои звуки: загрузи MP3 в GitHub → открой файл → нажми <b>Raw</b> → скопируй URL из адресной строки</p>
     </div>
 
     <!-- 6. ВОПРОСЫ -->
@@ -880,6 +886,31 @@ function recompressAllImages() {
         }
     });
     setTimeout(updateSizeDisplay, 200);
+}
+
+// =====================================================
+// АУДИО — тест воспроизведения
+// =====================================================
+var _testAudioEl = null;
+function testAudio(inputId) {
+    var url = document.getElementById(inputId).value.trim();
+    if (!url) return;
+    var btn = document.querySelector('[onclick="testAudio(\'' + inputId + '\')"]');
+
+    // Останавливаем предыдущий
+    if (_testAudioEl) { _testAudioEl.pause(); _testAudioEl = null; }
+    document.querySelectorAll('.audio-test-btn').forEach(function(b) { b.classList.remove('playing'); b.textContent = '▶'; });
+
+    var audio = new Audio(url);
+    _testAudioEl = audio;
+    if (btn) { btn.classList.add('playing'); btn.textContent = '■'; }
+    audio.play().catch(function() { if (btn) { btn.classList.remove('playing'); btn.textContent = '▶'; } });
+    audio.onended = function() { if (btn) { btn.classList.remove('playing'); btn.textContent = '▶'; } _testAudioEl = null; };
+}
+
+function getAudioUrl(key) {
+    var el = document.getElementById('url-snd-' + key);
+    return el ? el.value.trim() : '';
 }
 
 // =====================================================
@@ -1059,8 +1090,9 @@ function loadAudio(key, input) {
 // =====================================================
 function updateSizeDisplay() {
     var total = 0;
-    Object.keys(assets).forEach(function(k) {
-        total += assets[k].compSize || 0;
+    var imageKeys = ['hero', 'platform', 'bg', 'life', 'victory-hero', 'custom-particle'];
+    imageKeys.forEach(function(k) {
+        if (assets[k]) total += assets[k].compSize || 0;
     });
 
     var kb = Math.round(total / 1024);
@@ -1252,13 +1284,13 @@ function buildGameHTML(forDownload) {
     var imgVictHero   = getAsset('victory-hero', forDownload);
     var imgCustP      = getAsset('custom-particle', forDownload);
 
-    var sndStart      = getAsset('snd-start', forDownload);
-    var sndJump       = getAsset('snd-jump', forDownload);
-    var sndShock      = getAsset('snd-shock', forDownload);
-    var sndLose       = getAsset('snd-lose', forDownload);
-    var sndWin        = getAsset('snd-win', forDownload);
-    var sndLevel      = getAsset('snd-level', forDownload);
-    var sndCountdown  = getAsset('snd-countdown', forDownload);
+    var sndStart      = getAudioUrl('start');
+    var sndJump       = getAudioUrl('jump');
+    var sndShock      = getAudioUrl('shock');
+    var sndLose       = getAudioUrl('lose');
+    var sndWin        = getAudioUrl('win');
+    var sndLevel      = getAudioUrl('level');
+    var sndCountdown  = getAudioUrl('countdown');
 
     var levelsBank = {};
     Object.keys(gameData.levels).forEach(function(lvl) {
@@ -1403,7 +1435,7 @@ countdownHTML + '\n\n' +
 'var CPIMG='+JSON.stringify(imgCustP)+';\n' +
 'var GPS='+gpSize+'/100;\n' +
 'var GPSP='+gpSpeed+'/100;\n' +
-'var GPC='+gpCount+'/100;\n' +
+'var GPC='+gpCount+';\n' +
 
 'var TR={ru:{level:"УРОВЕНЬ",question:"Вопрос",outOfTime:"Время вышло!",go:"ВПЕРЁД!"},en:{level:"LEVEL",question:"Question",outOfTime:"Out of time!",go:"GO!"},de:{level:"STUFE",question:"Frage",outOfTime:"Zeit ab!",go:"LOS!"}};\n' +
 'var t=TR["'+lang+'"];\n' +
@@ -1508,6 +1540,11 @@ countdownHTML + '\n\n' +
 'else if(type==="snow"){p.x=Math.random()*fxC.width;p.y=-20;p.sz=(Math.random()*6+3)*GPS;p.vx=(Math.random()*2-1)*GPSP;p.vy=(Math.random()*2+1)*GPSP;p.rot=Math.random()*360;p.rs=(Math.random()*2-1)*GPSP;p.a=Math.random()*.5+.5;p.dec=0;p.t="snow";}\n' +
 'else if(type==="flower"){p.x=Math.random()*fxC.width;p.y=-20;p.sz=(Math.random()*14+8)*GPS;p.vx=(Math.random()*2-1)*GPSP;p.vy=(Math.random()*2+1)*GPSP;p.rot=Math.random()*360;p.rs=(Math.random()*4-2)*GPSP;p.a=Math.random()*.6+.4;p.hue=Math.floor(Math.random()*60+300);p.dec=0;p.t="flower";}\n' +
 'else if(type==="custom"){var bs=5*GPSP,dir=PDIR;p.sz=40*GPS;p.rot=Math.random()*360;p.rs=(Math.random()*4-2)*GPSP;p.a=Math.random()*.5+.5;if(dir==="down"){p.x=Math.random()*fxC.width;p.y=-p.sz;p.vx=(Math.random()*2-1)*bs;p.vy=bs;}else if(dir==="up"){p.x=Math.random()*fxC.width;p.y=fxC.height+p.sz;p.vx=(Math.random()*2-1)*bs;p.vy=-bs;}else if(dir==="explode"){p.x=fxC.width/2;p.y=fxC.height/2;var ang2=Math.random()*Math.PI*2;p.vx=Math.cos(ang2)*bs;p.vy=Math.sin(ang2)*bs;}else{p.x=Math.random()*fxC.width;p.y=Math.random()*fxC.height;p.vx=(Math.random()-.5)*bs*2;p.vy=(Math.random()-.5)*bs*2;}p.dec=0;p.t="custom";}\n' +
+'else if(type==="sparkle"){p.x=Math.random()*fxC.width;p.y=Math.random()*fxC.height;p.sz=(Math.random()*12+6)*GPS;p.a=Math.random()*.8+.2;p.life=Math.random()*30+10;p.maxLife=p.life;p.hue=Math.floor(Math.random()*60+40);p.dec=0;p.t="sparkle";}\n' +
+'else if(type==="rainbow"){p.x=Math.random()*fxC.width;p.y=-20;p.sz=(Math.random()*8+4)*GPS;p.vy=(Math.random()*3+2)*GPSP;p.vx=(Math.random()*2-1)*GPSP;p.hue=Math.floor(Math.random()*360);p.dec=0;p.t="rainbow";}\n' +
+'else if(type==="diamond"){p.x=Math.random()*fxC.width;p.y=-20;p.sz=(Math.random()*14+8)*GPS;p.vx=(Math.random()*2-1)*GPSP;p.vy=(Math.random()*3+2)*GPSP;p.rot=Math.random()*360;p.rs=(Math.random()*4-2)*GPSP;p.a=Math.random()*.6+.4;p.dec=0;p.t="diamond";}\n' +
+'else if(type==="sunshine"){p.x=fxC.width/2+(Math.random()-0.5)*fxC.width*.8;p.y=0;p.sz=(Math.random()*20+10)*GPS;p.vy=(Math.random()*2+1)*GPSP;p.vx=(Math.random()*2-1)*GPSP*0.5;p.rot=Math.random()*360;p.rs=(Math.random()*3-1.5)*GPSP;p.a=Math.random()*.7+.3;p.dec=0;p.t="sunshine";}\n' +
+'else if(type==="magic"){var ang3=Math.random()*Math.PI*2,sp3=(Math.random()*4+1)*GPSP;p.x=Math.random()*fxC.width;p.y=Math.random()*fxC.height;p.vx=Math.cos(ang3)*sp3;p.vy=Math.sin(ang3)*sp3;p.sz=(Math.random()*10+5)*GPS;p.hue=Math.floor(Math.random()*360);p.tw=Math.random()*Math.PI*2;p.dec=0;p.t="magic";}\n' +
 'return p;}\n' +
 
 'function drawP(p){\n' +
@@ -1521,6 +1558,11 @@ countdownHTML + '\n\n' +
 'else if(p.t==="snow"){ctx.translate(p.x,p.y);ctx.rotate(p.rot*Math.PI/180);ctx.strokeStyle="#FFF";ctx.lineWidth=2;for(var i=0;i<6;i++){ctx.save();ctx.rotate(Math.PI*2*i/6);ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(0,p.sz);ctx.stroke();ctx.restore();}}\n' +
 'else if(p.t==="flower"){ctx.translate(p.x,p.y);ctx.rotate(p.rot*Math.PI/180);ctx.fillStyle="hsl("+p.hue+",100%,70%)";for(var i=0;i<5;i++){ctx.save();ctx.rotate(Math.PI*2*i/5);ctx.beginPath();ctx.ellipse(0,-p.sz*.5,p.sz*.4,p.sz*.6,0,0,Math.PI*2);ctx.fill();ctx.restore();}ctx.fillStyle="#FFD700";ctx.beginPath();ctx.arc(0,0,p.sz*.3,0,Math.PI*2);ctx.fill();}\n' +
 'else if(p.t==="custom"&&cpImg&&cpImg.complete){ctx.translate(p.x,p.y);ctx.rotate(p.rot*Math.PI/180);ctx.drawImage(cpImg,-p.sz/2,-p.sz/2,p.sz,p.sz);}\n' +
+'else if(p.t==="sparkle"){ctx.fillStyle="hsl("+p.hue+",100%,90%)";var fade=p.life/p.maxLife;ctx.globalAlpha=p.a*fade;for(var i=0;i<4;i++){ctx.save();ctx.translate(p.x,p.y);ctx.rotate(Math.PI/4*i);ctx.beginPath();ctx.moveTo(0,-p.sz);ctx.lineTo(p.sz*.15,0);ctx.lineTo(0,p.sz);ctx.lineTo(-p.sz*.15,0);ctx.closePath();ctx.fill();ctx.restore();}}\n' +
+'else if(p.t==="rainbow"){ctx.beginPath();ctx.arc(p.x,p.y,p.sz,0,Math.PI*2);ctx.fillStyle="hsl("+p.hue+",100%,60%)";ctx.fill();}\n' +
+'else if(p.t==="diamond"){ctx.translate(p.x,p.y);ctx.rotate(p.rot*Math.PI/180);var g3=ctx.createLinearGradient(-p.sz,-p.sz,p.sz,p.sz);g3.addColorStop(0,"#E0FFFF");g3.addColorStop(.3,"#B0E0E6");g3.addColorStop(.6,"#87CEEB");g3.addColorStop(1,"#4169E1");ctx.fillStyle=g3;ctx.beginPath();ctx.moveTo(0,-p.sz);ctx.lineTo(p.sz*.6,0);ctx.lineTo(0,p.sz);ctx.lineTo(-p.sz*.6,0);ctx.closePath();ctx.fill();ctx.strokeStyle="rgba(255,255,255,.7)";ctx.lineWidth=1;ctx.stroke();}\n' +
+'else if(p.t==="sunshine"){ctx.translate(p.x,p.y);ctx.rotate(p.rot*Math.PI/180);ctx.fillStyle="#FFD700";ctx.strokeStyle="#FFA500";ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,0,p.sz*.5,0,Math.PI*2);ctx.fill();for(var i=0;i<8;i++){ctx.save();ctx.rotate(Math.PI*2*i/8);ctx.beginPath();ctx.moveTo(0,p.sz*.6);ctx.lineTo(0,p.sz);ctx.stroke();ctx.restore();}}\n' +
+'else if(p.t==="magic"){ctx.fillStyle="hsl("+p.hue+",100%,70%)";ctx.shadowColor="hsl("+p.hue+",100%,80%)";ctx.shadowBlur=8;ctx.beginPath();for(var i=0;i<5;i++){var a2=(Math.PI*2*i)/5-Math.PI/2;ctx.lineTo(p.x+Math.cos(a2)*p.sz*(Math.sin(p.tw)*.3+.7),p.y+Math.sin(a2)*p.sz*(Math.sin(p.tw)*.3+.7));}ctx.closePath();ctx.fill();ctx.shadowBlur=0;}\n' +
 'ctx.restore();}\n' +
 
 'function updP(p){\n' +
@@ -1533,21 +1575,31 @@ countdownHTML + '\n\n' +
 'else if(p.t==="snow"){p.y+=p.vy;p.x+=p.vx;p.rot+=p.rs;if(p.y>fxC.height)p.a-=.01;}\n' +
 'else if(p.t==="flower"){p.y+=p.vy;p.x+=p.vx;p.rot+=p.rs;if(p.y>fxC.height)p.a-=.01;}\n' +
 'else if(p.t==="custom"){p.x+=p.vx;p.y+=p.vy;p.rot+=p.rs;if(p.x<-p.sz||p.x>fxC.width+p.sz||p.y<-p.sz||p.y>fxC.height+p.sz)p.a-=.02;}\n' +
+'else if(p.t==="sparkle"){p.life--;if(p.life<=0)p.a=0;}\n' +
+'else if(p.t==="rainbow"){p.y+=p.vy;p.x+=p.vx;p.hue=(p.hue+2)%360;if(p.y>fxC.height)p.a-=.02;}\n' +
+'else if(p.t==="diamond"){p.y+=p.vy;p.x+=p.vx;p.rot+=p.rs;if(p.y>fxC.height)p.a-=.02;}\n' +
+'else if(p.t==="sunshine"){p.y+=p.vy;p.x+=p.vx;p.rot+=p.rs;if(p.y>fxC.height)p.a-=.02;}\n' +
+'else if(p.t==="magic"){p.x+=p.vx;p.y+=p.vy;p.tw+=.1;p.hue=(p.hue+3)%360;p.vx*=.98;p.vy*=.98;if(Math.abs(p.vx)<0.1&&Math.abs(p.vy)<0.1)p.a-=.02;}\n' +
 '}\n' +
 
 'var cpImg=null;if(CPIMG){cpImg=new Image();cpImg.src=CPIMG;}\n' +
 
 'function spawnEff(eff){\n' +
-'var n=Math.max(1,Math.round(GPC));\n' +
-'if(eff==="fireworks"){var hue=Math.floor(Math.random()*360),col="hsl("+hue+",100%,50%)";for(var i=0;i<Math.round(50*n);i++)parts.push(mkP("fire",Math.random()*fxC.width,Math.random()*fxC.height*.7));}\n' +
-'else if(eff==="confetti"){for(var i=0;i<Math.round(10*n);i++)parts.push(mkP("conf"));}\n' +
-'else if(eff==="stars"){for(var i=0;i<Math.round(5*n);i++)parts.push(mkP("star"));}\n' +
-'else if(eff==="hearts"){for(var i=0;i<Math.round(4*n);i++)parts.push(mkP("heart"));}\n' +
-'else if(eff==="bubbles"){for(var i=0;i<Math.round(4*n);i++)parts.push(mkP("bubble"));}\n' +
-'else if(eff==="gold"||eff==="coins"){for(var i=0;i<Math.round(6*n);i++)parts.push(mkP("coin"));}\n' +
-'else if(eff==="snow"){for(var i=0;i<Math.round(6*n);i++)parts.push(mkP("snow"));}\n' +
-'else if(eff==="flowers"){for(var i=0;i<Math.round(3*n);i++)parts.push(mkP("flower"));}\n' +
-'else if(eff==="custom"){for(var i=0;i<Math.round(6*n);i++)parts.push(mkP("custom"));}\n' +
+'var n=Math.max(1,Math.round(GPC/10));\n' +
+'if(eff==="fireworks"){for(var i=0;i<Math.round(5*n);i++)parts.push(mkP("fire",Math.random()*fxC.width,Math.random()*fxC.height*.7));}\n' +
+'else if(eff==="confetti"){for(var i=0;i<Math.round(1*n);i++)parts.push(mkP("conf"));}\n' +
+'else if(eff==="stars"){for(var i=0;i<Math.round(1*n);i++)parts.push(mkP("star"));}\n' +
+'else if(eff==="hearts"){for(var i=0;i<Math.round(1*n);i++)parts.push(mkP("heart"));}\n' +
+'else if(eff==="sparkles"){for(var i=0;i<Math.round(3*n);i++)parts.push(mkP("sparkle"));}\n' +
+'else if(eff==="bubbles"){for(var i=0;i<Math.round(1*n);i++)parts.push(mkP("bubble"));}\n' +
+'else if(eff==="rainbow"){for(var i=0;i<Math.round(2*n);i++)parts.push(mkP("rainbow"));}\n' +
+'else if(eff==="gold"){for(var i=0;i<Math.round(1*n);i++)parts.push(mkP("coin"));}\n' +
+'else if(eff==="diamonds"){for(var i=0;i<Math.round(1*n);i++)parts.push(mkP("diamond"));}\n' +
+'else if(eff==="snow"){for(var i=0;i<Math.round(1*n);i++)parts.push(mkP("snow"));}\n' +
+'else if(eff==="flowers"){for(var i=0;i<Math.round(1*n);i++)parts.push(mkP("flower"));}\n' +
+'else if(eff==="sunshine"){for(var i=0;i<Math.round(2*n);i++)parts.push(mkP("sunshine"));}\n' +
+'else if(eff==="magic"){for(var i=0;i<Math.round(3*n);i++)parts.push(mkP("magic"));}\n' +
+'else if(eff==="custom"){for(var i=0;i<Math.round(1*n);i++)parts.push(mkP("custom"));}\n' +
 '}\n' +
 
 'function animLoop(){animId=requestAnimationFrame(animLoop);ctx.clearRect(0,0,fxC.width,fxC.height);parts=parts.filter(function(p){updP(p);drawP(p);return p.a>0;});if(Math.random()<.1)spawnEff(VEFF);}\n' +
