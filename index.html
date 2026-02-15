@@ -1223,13 +1223,19 @@ function compressImage(dataUrl, isBg, callback) {
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
         if (isPng) {
-            // Для PNG всегда используем формат png, чтобы не потерять прозрачность
-            callback(canvas.toDataURL('image/png'));
+            // Для PNG всегда используем формат png
+            var data = canvas.toDataURL('image/png');
+            if (typeof callback === 'function') {
+                callback(data);
+            }
         } else {
             // Для остальных (JPEG) используем качество из слайдера
-            callback(canvas.toDataURL('image/jpeg', quality));
+            var data = canvas.toDataURL('image/jpeg', quality);
+            if (typeof callback === 'function') {
+                callback(data);
+            }
         }
-    };
+    }; // Эту точку с запятой оставляем!
     img.src = dataUrl;
 }
 
@@ -1440,21 +1446,46 @@ function switchLevel(level) {
     updateQuestionsPreview();
 }
 
-// Per-level images
 function loadLevelImage(slot, input) {
     var file = input.files[0];
     if (!file) return;
+    
+    var label = input.parentElement.querySelector('.file-name');
+    if (label) label.textContent = "Загрузка...";
+
     var reader = new FileReader();
     reader.onload = function(e) {
-        compressImage(e.target.result, function(compressed) {
-            if (!levelMeta[currentLevel]) levelMeta[currentLevel] = { name: '', assets: {} };
-            levelMeta[currentLevel].assets[slot] = {
-                original: e.target.result, compressed: compressed,
-                origSize: e.target.result.length, compSize: compressed.length, name: file.name
-            };
-            updateLevelFileUI(slot, compressed, file.name);
-            updateSizeDisplay(); schedulePreview();
-        });
+        var dataUrl = e.target.result;
+        
+        // Определяем индекс уровня
+        var idx = (typeof currentLevel !== 'undefined') ? currentLevel : 
+                  (typeof currentLevelIndex !== 'undefined' ? currentLevelIndex : 0);
+
+        console.log("Прикрепляю файл напрямую для уровня:", idx, "слот:", slot);
+
+        // Сохраняем напрямую в levelMeta, минуя функцию сжатия
+        if (!window.levelMeta) window.levelMeta = {};
+        if (!levelMeta[idx]) levelMeta[idx] = { name: '', assets: {} };
+        if (!levelMeta[idx].assets) levelMeta[idx].assets = {};
+
+        levelMeta[idx].assets[slot] = {
+            original: dataUrl,
+            compressed: dataUrl, // Используем оригинал вместо сжатой версии
+            name: file.name,
+            compSize: dataUrl.length
+        };
+
+        // Обновляем визуальную часть редактора
+        if (typeof updateLevelFileUI === 'function') {
+            updateLevelFileUI(slot, dataUrl, file.name);
+        }
+        
+        if (label) label.textContent = file.name;
+
+        // ПРИНУДИТЕЛЬНО обновляем превью игры
+        if (typeof updatePreview === 'function') updatePreview();
+        
+        console.log("Файл успешно прикреплен!");
     };
     reader.readAsDataURL(file);
 }
@@ -1470,19 +1501,28 @@ function clearLevelFile(slot, event) {
     if (sz) { sz.textContent=''; sz.className='size-badge'; }
     updateSizeDisplay(); schedulePreview();
 }
-
 function updateLevelFileUI(slot, dataUrl, name) {
-    var btn = document.getElementById('btn-' + slot);
+    // Ищем элементы: thumb-lhero, thumb-lplatform, thumb-lbg
     var thumb = document.getElementById('thumb-' + slot);
+    var btn = document.getElementById('btn-' + slot);
     var sz = document.getElementById('sz-' + slot);
-    if (!btn) return;
-    btn.classList.add('has-file');
-    var n = btn.querySelector('.file-name'); if(n) n.textContent = name||'загружено';
-    if (thumb) thumb.src = dataUrl;
-    if (sz && levelMeta[currentLevel] && levelMeta[currentLevel].assets[slot]) {
-        var kb = Math.round(levelMeta[currentLevel].assets[slot].compSize/1024);
-        sz.textContent = kb+'KB';
-        sz.className = kb>100?'size-badge danger':kb>50?'size-badge warn':'size-badge';
+
+    if (thumb) {
+        thumb.src = dataUrl;
+        thumb.style.display = 'inline-block'; // Показываем иконку
+    }
+
+    if (btn) {
+        btn.classList.add('has-file');
+        var nameSpan = btn.querySelector('.file-name');
+        if (nameSpan) nameSpan.textContent = name || 'Файл загружен';
+    }
+
+    // Рассчитываем размер для значка (size-badge)
+    if (sz) {
+        var kb = Math.round(dataUrl.length / 1024);
+        sz.textContent = kb + ' KB';
+        sz.style.display = 'block';
     }
 }
 
